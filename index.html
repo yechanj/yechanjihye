@@ -424,14 +424,79 @@
     .map-btns .btn { font-size: 0.8rem; padding: 10px 20px; }
 
     /* ========== GALLERY ========== */
-    #gallery { padding: 52px 14px; }
+    #gallery { padding: 52px 0 52px; }
+    #gallery > .section-label-en { display: block; padding: 0 14px; }
     .gallery-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      margin-top: 6px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-top: 8px;
     }
-    .gallery-item { aspect-ratio: 1; }
+    .gallery-item {
+      aspect-ratio: 1;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .gallery-item img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.18s;
+    }
+    .gallery-item:active img { transform: scale(0.93); }
+    .gallery-item .photo-edit-btn {
+      position: absolute; bottom: 4px; right: 4px;
+      width: 26px; height: 26px; font-size: 13px;
+      background: rgba(0,0,0,0.45); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; opacity: 0; transition: opacity 0.2s;
+      cursor: pointer;
+    }
+    .gallery-item:hover .photo-edit-btn,
+    .gallery-item:focus-within .photo-edit-btn { opacity: 1; }
+    .gallery-add-btn {
+      aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      background: #f5f0eb;
+      border: 2px dashed #c8b8a8;
+      cursor: pointer; color: #b0a090;
+      font-size: 30px; font-weight: 200;
+    }
+    .gallery-add-btn input { display: none; }
+
+    /* ========== LIGHTBOX ========== */
+    #lightbox {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.96); z-index: 300;
+      align-items: center; justify-content: center;
+      flex-direction: column;
+    }
+    #lightbox.open { display: flex; }
+    #lb-img {
+      max-width: 100vw; max-height: 84vh;
+      object-fit: contain; display: block;
+      user-select: none; -webkit-user-drag: none;
+    }
+    #lb-close {
+      position: absolute; top: 14px; right: 16px;
+      background: none; border: none;
+      color: rgba(255,255,255,0.88); font-size: 26px;
+      cursor: pointer; line-height: 1; padding: 6px 10px; z-index: 301;
+    }
+    #lb-prev, #lb-next {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,0.12); border: none; color: #fff;
+      font-size: 32px; width: 44px; height: 44px; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      z-index: 301; transition: background 0.2s;
+    }
+    #lb-prev:hover, #lb-next:hover { background: rgba(255,255,255,0.26); }
+    #lb-prev { left: 10px; }
+    #lb-next { right: 10px; }
+    #lb-counter {
+      position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,0.55); font-size: 0.78rem; letter-spacing: 0.08em;
+      font-family: 'Playfair Display', serif;
+    }
 
     /* ========== ACCOUNT ========== */
 
@@ -853,33 +918,23 @@
 <!-- ████ 7. GALLERY ████ -->
 <section id="gallery" class="section">
   <span class="section-label-en">Gallery</span>
-  <div class="gallery-grid">
-    <div class="gallery-item photo-slot" id="g1-slot">
-      <img id="g1-img" alt="갤러리1">
-      <div class="photo-placeholder" id="g1-ph"><span class="ph-icon">📷</span><p>갤러리 1</p></div>
-      <div class="photo-uploading" id="g1-uploading"><div class="upload-spinner"></div><span>업로드 중...</span></div>
-      <label class="photo-edit-btn" title="사진 변경">📷<input type="file" accept="image/*" onchange="uploadPhoto(this.files[0],'gallery1','g1-img','g1-ph','g1-uploading')"></label>
-    </div>
-    <div class="gallery-item photo-slot" id="g2-slot">
-      <img id="g2-img" alt="갤러리2">
-      <div class="photo-placeholder" id="g2-ph"><span class="ph-icon">📷</span><p>갤러리 2</p></div>
-      <div class="photo-uploading" id="g2-uploading"><div class="upload-spinner"></div><span>업로드 중...</span></div>
-      <label class="photo-edit-btn" title="사진 변경">📷<input type="file" accept="image/*" onchange="uploadPhoto(this.files[0],'gallery2','g2-img','g2-ph','g2-uploading')"></label>
-    </div>
-    <div class="gallery-item photo-slot" id="g3-slot">
-      <img id="g3-img" alt="갤러리3">
-      <div class="photo-placeholder" id="g3-ph"><span class="ph-icon">📷</span><p>갤러리 3</p></div>
-      <div class="photo-uploading" id="g3-uploading"><div class="upload-spinner"></div><span>업로드 중...</span></div>
-      <label class="photo-edit-btn" title="사진 변경">📷<input type="file" accept="image/*" onchange="uploadPhoto(this.files[0],'gallery3','g3-img','g3-ph','g3-uploading')"></label>
-    </div>
-    <div class="gallery-item photo-slot" id="g4-slot">
-      <img id="g4-img" alt="갤러리4">
-      <div class="photo-placeholder" id="g4-ph"><span class="ph-icon">📷</span><p>갤러리 4</p></div>
-      <div class="photo-uploading" id="g4-uploading"><div class="upload-spinner"></div><span>업로드 중...</span></div>
-      <label class="photo-edit-btn" title="사진 변경">📷<input type="file" accept="image/*" onchange="uploadPhoto(this.files[0],'gallery4','g4-img','g4-ph','g4-uploading')"></label>
-    </div>
+  <div class="gallery-grid" id="gallery-grid">
+    <!-- gallery items injected by JS -->
+    <label class="gallery-add-btn" id="gallery-add-btn" title="사진 추가">
+      <span>+</span>
+      <input type="file" accept="image/*" id="gallery-add-input">
+    </label>
   </div>
 </section>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <button id="lb-close" onclick="closeLightbox()">✕</button>
+  <button id="lb-prev" onclick="moveLightbox(-1)">&#8249;</button>
+  <img id="lb-img" alt="">
+  <button id="lb-next" onclick="moveLightbox(1)">&#8250;</button>
+  <div id="lb-counter"></div>
+</div>
 
 <!-- ████ 8. ACCOUNT ████ -->
 <section id="account" class="section section-alt">
@@ -1011,11 +1066,8 @@ const PHOTO_SLOTS = [
   { key:'poem',     imgId:'poem-img',  phId:'poem-ph'  },
   { key:'groom',    imgId:'groom-img', phId:'groom-ph' },
   { key:'bride',    imgId:'bride-img', phId:'bride-ph' },
-  { key:'gallery1', imgId:'g1-img',    phId:'g1-ph'    },
-  { key:'gallery2', imgId:'g2-img',    phId:'g2-ph'    },
-  { key:'gallery3', imgId:'g3-img',    phId:'g3-ph'    },
-  { key:'gallery4', imgId:'g4-img',    phId:'g4-ph'    },
 ];
+const GALLERY_MAX = 50;
 
 function applyPhoto(imgId, phId, url) {
   const img = document.getElementById(imgId);
@@ -1030,8 +1082,115 @@ function loadAllPhotos() {
   PHOTO_SLOTS.forEach(({ key, imgId, phId }) => {
     applyPhoto(imgId, phId, `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/f_auto/wedding/${key}`);
   });
+  buildGallery();
+  loadGalleryPhotos();
 }
 loadAllPhotos();
+
+// ===== GALLERY =====
+function buildGallery() {
+  const grid   = document.getElementById('gallery-grid');
+  const addBtn = document.getElementById('gallery-add-btn');
+  for (let i = 1; i <= GALLERY_MAX; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'gallery-item photo-slot';
+    slot.id = `g${i}-slot`;
+    slot.style.display = 'none';
+    slot.innerHTML = `
+      <img id="g${i}-img" alt="">
+      <div class="photo-uploading" id="g${i}-uploading"><div class="upload-spinner"></div></div>
+      <label class="photo-edit-btn" title="사진 변경">✎<input type="file" accept="image/*" onchange="uploadGallerySlot(this.files[0],${i})"></label>
+    `;
+    slot.querySelector('img').addEventListener('click', (e) => { e.stopPropagation(); openLightbox(i); });
+    grid.insertBefore(slot, addBtn);
+  }
+}
+
+function loadGalleryPhotos() {
+  for (let i = 1; i <= GALLERY_MAX; i++) {
+    const img  = document.getElementById(`g${i}-img`);
+    const slot = document.getElementById(`g${i}-slot`);
+    if (!img || !slot) continue;
+    img.onload  = () => { img.classList.add('loaded'); slot.style.display = ''; };
+    img.onerror = () => { slot.style.display = 'none'; };
+    img.src = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/f_auto/wedding/gallery${i}`;
+  }
+}
+
+async function uploadGallerySlot(file, idx) {
+  if (!file) return;
+  const slot = document.getElementById(`g${idx}-slot`);
+  if (slot) slot.style.display = '';
+  await uploadPhoto(file, `gallery${idx}`, `g${idx}-img`, null, `g${idx}-uploading`);
+}
+
+document.getElementById('gallery-add-input').addEventListener('change', async function () {
+  const file = this.files[0];
+  if (!file) return;
+  this.value = '';
+  let next = 1;
+  for (let i = 1; i <= GALLERY_MAX; i++) {
+    const img = document.getElementById(`g${i}-img`);
+    if (img && img.classList.contains('loaded')) next = i + 1;
+  }
+  if (next > GALLERY_MAX) { alert('갤러리는 최대 50장까지 추가할 수 있습니다.'); return; }
+  await uploadGallerySlot(file, next);
+});
+
+// ===== LIGHTBOX =====
+let lbPhotos = [];
+let lbIdx    = 0;
+let lbTouchX = 0;
+
+function openLightbox(slotIdx) {
+  lbPhotos = [];
+  let target = 0;
+  for (let i = 1; i <= GALLERY_MAX; i++) {
+    const img = document.getElementById(`g${i}-img`);
+    if (img && img.classList.contains('loaded')) {
+      if (i === slotIdx) target = lbPhotos.length;
+      lbPhotos.push(i);
+    }
+  }
+  lbIdx = target;
+  updateLightbox();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function moveLightbox(dir) {
+  if (!lbPhotos.length) return;
+  lbIdx = (lbIdx + dir + lbPhotos.length) % lbPhotos.length;
+  updateLightbox();
+}
+
+function updateLightbox() {
+  const img = document.getElementById(`g${lbPhotos[lbIdx]}-img`);
+  document.getElementById('lb-img').src   = img ? img.src : '';
+  document.getElementById('lb-counter').textContent = `${lbIdx + 1} / ${lbPhotos.length}`;
+  const show = lbPhotos.length > 1;
+  document.getElementById('lb-prev').style.display = show ? '' : 'none';
+  document.getElementById('lb-next').style.display = show ? '' : 'none';
+}
+
+const lbEl = document.getElementById('lightbox');
+lbEl.addEventListener('click', (e) => { if (e.target === lbEl || e.target === document.getElementById('lb-img')) closeLightbox(); });
+lbEl.addEventListener('touchstart', e => { lbTouchX = e.touches[0].clientX; }, { passive: true });
+lbEl.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - lbTouchX;
+  if (Math.abs(dx) > 50) { e.stopPropagation(); moveLightbox(dx < 0 ? 1 : -1); }
+});
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  if (e.key === 'Escape')      closeLightbox();
+  if (e.key === 'ArrowRight')  moveLightbox(1);
+  if (e.key === 'ArrowLeft')   moveLightbox(-1);
+});
 
 async function getSignature(public_id) {
   const timestamp = Math.round(Date.now() / 1000);
