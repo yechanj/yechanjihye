@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>모바일 청첩장</title>
+  <title>예찬❤️지혜</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Nanum+Myeongjo:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
@@ -481,6 +481,13 @@
       background: none; border: none;
       color: rgba(255,255,255,0.88); font-size: 26px;
       cursor: pointer; line-height: 1; padding: 6px 10px; z-index: 301;
+    }
+    #lb-edit {
+      position: absolute; top: 14px; right: 58px;
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.85); font-size: 17px;
+      cursor: pointer; line-height: 1; padding: 6px 10px; z-index: 301;
+      border-radius: 4px; display: flex; align-items: center;
     }
     #lb-prev, #lb-next {
       position: absolute; top: 50%; transform: translateY(-50%);
@@ -986,6 +993,10 @@
 <!-- LIGHTBOX -->
 <div id="lightbox">
   <button id="lb-close" onclick="closeLightbox()">✕</button>
+  <label id="lb-edit" title="사진 변경">
+    ✎
+    <input type="file" accept="image/*" id="lb-edit-input" style="display:none">
+  </label>
   <button id="lb-prev" onclick="moveLightbox(-1)">&#8249;</button>
   <img id="lb-img" alt="">
   <button id="lb-next" onclick="moveLightbox(1)">&#8250;</button>
@@ -1252,6 +1263,18 @@ function updateLightbox() {
   document.getElementById('lb-prev').style.display = show ? '' : 'none';
   document.getElementById('lb-next').style.display = show ? '' : 'none';
 }
+
+document.getElementById('lb-edit-input').addEventListener('change', async function () {
+  const file = this.files[0];
+  if (!file) return;
+  this.value = '';
+  const idx = lbPhotos[lbIdx];
+  closeLightbox();
+  await uploadGallerySlot(file, idx);
+  // 업로드 완료 후 라이트박스 다시 열기
+  const img = document.getElementById(`g${idx}-img`);
+  if (img && img.classList.contains('loaded')) openLightbox(idx);
+});
 
 const lbEl = document.getElementById('lightbox');
 lbEl.addEventListener('click', (e) => { if (e.target === lbEl || e.target === document.getElementById('lb-img')) closeLightbox(); });
