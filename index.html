@@ -991,8 +991,7 @@
 
 <script>
 // ===== CLOUDINARY =====
-const CLOUD_NAME    = 'rpifgmju';
-const UPLOAD_PRESET = 'yechanjihye';
+const CLOUD_NAME = 'rpifgmju';
 
 const PHOTO_SLOTS = [
   { key:'cover',    imgId:'hero-img',  phId:'hero-ph'  },
@@ -1016,26 +1015,42 @@ function applyPhoto(imgId, phId, url) {
 
 function loadAllPhotos() {
   PHOTO_SLOTS.forEach(({ key, imgId, phId }) => {
-    const url = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/f_auto/wedding/${key}`;
-    applyPhoto(imgId, phId, url);
+    applyPhoto(imgId, phId, `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/f_auto/wedding/${key}`);
   });
 }
 loadAllPhotos();
+
+async function getSignature(public_id) {
+  const timestamp = Math.round(Date.now() / 1000);
+  const res  = await fetch('/api/sign', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ public_id, timestamp })
+  });
+  const data = await res.json();
+  return { ...data, timestamp };
+}
 
 async function uploadPhoto(file, key, imgId, phId, upId) {
   if (!file) return;
   const upEl = document.getElementById(upId);
   if (upEl) upEl.classList.add('active');
 
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', UPLOAD_PRESET);
-  formData.append('public_id', `wedding/${key}`);
-
   try {
+    const public_id = `wedding/${key}`;
+    const { signature, api_key, timestamp } = await getSignature(public_id);
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('api_key', api_key);
+    formData.append('timestamp', String(timestamp));
+    formData.append('signature', signature);
+    formData.append('public_id', public_id);
+    formData.append('overwrite', 'true');
+    formData.append('invalidate', 'true');
+
     const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-      method: 'POST',
-      body: formData
+      method: 'POST', body: formData
     });
     const data = await res.json();
     if (data.secure_url) {
@@ -1142,25 +1157,15 @@ function setupBgmAutoplay() {
 
 dbLoad('bgm_title', t => { if (t) musicTitle.textContent = t; });
 
-// 모바일은 canplaythrough가 안 터지므로 URL만 세팅하고 바로 bgmLoaded = true
-const CLOUDINARY_BGM = `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/wedding/bgm`;
-bgm.src = CLOUDINARY_BGM;
+// Cloudinary BGM URL 로드 (signed 업로드 후 고정 경로)
+bgm.src = `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/wedding/bgm`;
 bgmLoaded = true;
 setupBgmAutoplay();
-
-// 실제로 파일이 없으면(404) error 이벤트 → IndexedDB 폴백
 bgm.addEventListener('error', function onErr() {
-  bgm.removeEventListener('error', onErr);
   bgmLoaded = false;
-  dbLoad('bgm_src', src => {
-    if (!src) return;
-    bgm.src = src;
-    bgmLoaded = true;
-    setupBgmAutoplay();
-  });
 }, { once: true });
 
-// MP3 파일 선택 → Cloudinary 업로드
+// MP3 파일 선택 → Cloudinary signed 업로드
 bgmFileEl.addEventListener('change', async function () {
   const file = this.files[0];
   if (!file) return;
@@ -1168,19 +1173,24 @@ bgmFileEl.addEventListener('change', async function () {
   musicTitle.textContent = title;
   dbSave('bgm_title', title);
 
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', UPLOAD_PRESET);
-  formData.append('public_id', 'wedding/bgm');
-
   try {
+    const public_id = 'wedding/bgm';
+    const { signature, api_key, timestamp } = await getSignature(public_id);
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('api_key', api_key);
+    formData.append('timestamp', String(timestamp));
+    formData.append('signature', signature);
+    formData.append('public_id', public_id);
+    formData.append('overwrite', 'true');
+    formData.append('invalidate', 'true');
+
     const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, {
-      method: 'POST',
-      body: formData
+      method: 'POST', body: formData
     });
     const data = await res.json();
     if (data.secure_url) {
-      dbSave('bgm_src', data.secure_url);
       bgm.src = data.secure_url;
       bgmLoaded = true;
       bgm.play().then(() => { soundIcon.textContent = '🔊'; }).catch(() => {});
