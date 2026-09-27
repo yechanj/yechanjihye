@@ -1016,7 +1016,7 @@ function applyPhoto(imgId, phId, url) {
 
 function loadAllPhotos() {
   PHOTO_SLOTS.forEach(({ key, imgId, phId }) => {
-    const url = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/f_auto,q_auto/wedding/${key}`;
+    const url = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/f_auto/wedding/${key}`;
     applyPhoto(imgId, phId, url);
   });
 }
@@ -1143,7 +1143,7 @@ function setupBgmAutoplay() {
 dbLoad('bgm_title', t => { if (t) musicTitle.textContent = t; });
 
 // 모바일은 canplaythrough가 안 터지므로 URL만 세팅하고 바로 bgmLoaded = true
-const CLOUDINARY_BGM = `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/wedding/bgm.mp3`;
+const CLOUDINARY_BGM = `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/wedding/bgm`;
 bgm.src = CLOUDINARY_BGM;
 bgmLoaded = true;
 setupBgmAutoplay();
