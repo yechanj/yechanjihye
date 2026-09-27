@@ -498,6 +498,56 @@
       font-family: 'Playfair Display', serif;
     }
 
+    /* ========== INTRO ========== */
+    #intro {
+      position: fixed; inset: 0; z-index: 500;
+      background: #1a1514;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 14px;
+      transition: opacity 0.8s ease;
+    }
+    #intro.hiding { opacity: 0; pointer-events: none; }
+    .intro-label {
+      color: #8a7060;
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+    }
+    .intro-names {
+      color: #f5ede8;
+      font-family: 'Great Vibes', cursive;
+      font-size: 3.4rem;
+      line-height: 1.1;
+    }
+    .intro-date {
+      color: #b09888;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.22em;
+    }
+    .intro-divider {
+      width: 36px; height: 1px;
+      background: #4a3a2e;
+    }
+    .intro-btn {
+      margin-top: 24px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.8);
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.22em;
+      padding: 13px 36px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+    .intro-btn:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.45);
+      color: #fff;
+    }
+
     /* ========== ACCOUNT ========== */
 
     .account-card {
@@ -746,6 +796,16 @@
   </style>
 </head>
 <body>
+
+<!-- ████ INTRO ████ -->
+<div id="intro">
+  <p class="intro-label">We're Getting Married</p>
+  <div class="intro-divider"></div>
+  <h1 class="intro-names">Yechan &amp; Jihye</h1>
+  <div class="intro-divider"></div>
+  <p class="intro-date">2027 · 03 · 06</p>
+  <button class="intro-btn" onclick="enterCard()">청첩장 열기</button>
+</div>
 
 <audio id="bgm" loop preload="auto"></audio>
 <input type="file" id="bgm-file" accept="audio/*" style="display:none">
@@ -1311,20 +1371,19 @@ const musicBanner = document.getElementById('music-banner');
 const musicTitle  = document.getElementById('music-title');
 let bgmLoaded = false;
 
-soundIcon.textContent = '🔊';
+soundIcon.textContent = '🔇';
 
 bgm.addEventListener('play',  () => musicBanner.classList.add('visible'));
 bgm.addEventListener('pause', () => musicBanner.classList.remove('visible'));
 bgm.addEventListener('ended', () => musicBanner.classList.remove('visible'));
 
-function setupBgmAutoplay() {
-  document.addEventListener('click', function resume(e) {
-    if (e.target.closest('#sound-btn')) return;
-    bgm.play()
-      .then(() => { soundIcon.textContent = '🔊'; })
-      .catch(() => { bgmLoaded = false; });
-    document.removeEventListener('click', resume);
-  });
+function enterCard() {
+  const intro = document.getElementById('intro');
+  intro.classList.add('hiding');
+  setTimeout(() => { intro.style.display = 'none'; }, 820);
+  if (bgmLoaded) {
+    bgm.play().then(() => { soundIcon.textContent = '🔊'; }).catch(() => {});
+  }
 }
 
 dbLoad('bgm_title', t => { if (t) musicTitle.textContent = t; });
@@ -1337,7 +1396,6 @@ fetch(`https://res.cloudinary.com/${CLOUD_NAME}/raw/upload/wedding/bgm_title.txt
 // Cloudinary BGM URL 로드 (signed 업로드 후 고정 경로)
 bgm.src = `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/wedding/bgm`;
 bgmLoaded = true;
-setupBgmAutoplay();
 bgm.addEventListener('error', function onErr() {
   bgmLoaded = false;
 }, { once: true });
