@@ -1516,51 +1516,96 @@ function copyNum(btn, numId) {
   });
 }
 
-// ===== PHONE EDIT =====
-const PHONE_IDS = ['yechan','groom-dad','groom-mom','jihye','bride-dad','bride-mom'];
-function loadPhones() {
-  PHONE_IDS.forEach(id => {
-    const saved = localStorage.getItem(`phone_${id}`);
-    if (saved) {
-      const el = document.getElementById(`call-${id}`);
-      if (el) el.href = `tel:${saved}`;
-    }
+// ===== CONTACT DATA (Cloudinary 크로스 디바이스 동기화) =====
+const CONTACT_PUBLIC_ID = 'wedding/contact_data.json';
+let contactData = { phones: {}, accounts: {} };
+
+function applyContactData(data) {
+  Object.entries(data.phones  || {}).forEach(([id, num]) => {
+    const el = document.getElementById(`call-${id}`);
+    if (el) el.href = `tel:${num}`;
+  });
+  Object.entries(data.accounts || {}).forEach(([id, info]) => {
+    const b = document.getElementById(`bank-${id}`);
+    const n = document.getElementById(`num-${id}`);
+    if (b) b.textContent = info.bank || '—';
+    if (n) n.textContent = info.num  || '—';
   });
 }
+
+async function loadContactData() {
+  // localStorage 캐시 우선 적용 (빠름)
+  try {
+    const cached = localStorage.getItem('contactData');
+    if (cached) applyContactData(JSON.parse(cached));
+  } catch {}
+  // Cloudinary에서 최신 데이터 fetch
+  try {
+    const res = await fetch(
+      `https://res.cloudinary.com/${CLOUD_NAME}/raw/upload/${CONTACT_PUBLIC_ID}?_=${Date.now()}`
+    );
+    if (res.ok) {
+      const data = await res.json();
+      contactData = data;
+      applyContactData(data);
+      localStorage.setItem('contactData', JSON.stringify(data));
+    }
+  } catch {}
+}
+loadContactData();
+
+async function saveContactData() {
+  const json = JSON.stringify(contactData);
+  localStorage.setItem('contactData', json);
+  if (location.hostname !== 'yechanjihye.vercel.app') return;
+  try {
+    const timestamp = Math.round(Date.now() / 1000);
+    const signRes = await fetch('/api/sign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ public_id: CONTACT_PUBLIC_ID, timestamp })
+    });
+    if (!signRes.ok) return;
+    const { signature, api_key } = await signRes.json();
+    const form = new FormData();
+    form.append('file', new Blob([json], { type: 'application/json' }));
+    form.append('api_key', api_key);
+    form.append('timestamp', String(timestamp));
+    form.append('signature', signature);
+    form.append('public_id', CONTACT_PUBLIC_ID);
+    form.append('overwrite', 'true');
+    form.append('invalidate', 'true');
+    await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/raw/upload`, {
+      method: 'POST', body: form
+    });
+  } catch {}
+}
+
 function editPhone(id) {
   const el = document.getElementById(`call-${id}`);
-  const current = el ? el.getAttribute('href').replace('tel:', '') : '';
-  const num = prompt('전화번호 입력 (예: 010-1234-5678)', current === '010-0000-0000' ? '' : current);
+  const current = contactData.phones[id] || '';
+  const num = prompt('전화번호 입력 (예: 010-1234-5678)', current);
   if (num === null) return;
   const val = num.trim();
-  if (el) el.href = `tel:${val || '010-0000-0000'}`;
-  if (val) localStorage.setItem(`phone_${id}`, val);
+  if (!val) return;
+  if (el) el.href = `tel:${val}`;
+  contactData.phones[id] = val;
+  saveContactData();
 }
-loadPhones();
 
-// ===== ACCOUNT EDIT =====
-const ACCOUNT_IDS = ['yechan','groom-dad','jihye','bride-dad'];
-function loadAccounts() {
-  ACCOUNT_IDS.forEach(id => {
-    const bank = localStorage.getItem(`acc_bank_${id}`);
-    const num  = localStorage.getItem(`acc_num_${id}`);
-    if (bank) { const el = document.getElementById(`bank-${id}`); if (el) el.textContent = bank; }
-    if (num)  { const el = document.getElementById(`num-${id}`);  if (el) el.textContent = num; }
-  });
-}
 function editAccount(id) {
   const bankEl = document.getElementById(`bank-${id}`);
   const numEl  = document.getElementById(`num-${id}`);
-  const bank = prompt('은행명 입력 (예: 카카오뱅크)', bankEl?.textContent === '—' ? '' : bankEl?.textContent || '');
+  const curr   = contactData.accounts[id] || {};
+  const bank = prompt('은행명 입력 (예: 카카오뱅크)', curr.bank || '');
   if (bank === null) return;
-  const num  = prompt('계좌번호 입력 (예: 3333-01-1234567)', numEl?.textContent === '—' ? '' : numEl?.textContent || '');
+  const num = prompt('계좌번호 입력 (예: 3333-01-1234567)', curr.num || '');
   if (num === null) return;
   if (bankEl) bankEl.textContent = bank || '—';
   if (numEl)  numEl.textContent  = num  || '—';
-  if (bank) localStorage.setItem(`acc_bank_${id}`, bank);
-  if (num)  localStorage.setItem(`acc_num_${id}`,  num);
+  contactData.accounts[id] = { bank: bank || '', num: num || '' };
+  saveContactData();
 }
-loadAccounts();
 </script>
 </body>
 </html>
