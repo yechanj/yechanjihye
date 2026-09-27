@@ -679,30 +679,6 @@
     .nav-icon { font-size: 17px; line-height: 1; }
     .nav-div { width: 1px; height: 22px; background: #e0d8d0; }
 
-    /* ========== FLOATING RSVP ========== */
-    #rsvp-float {
-      position: fixed;
-      bottom: 64px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 99;
-    }
-    .rsvp-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 20px;
-      background: rgba(255,255,255,0.96);
-      border: 1px solid #c8b8a8;
-      border-radius: 24px;
-      font-family: 'Nanum Myeongjo', serif;
-      font-size: 0.8rem;
-      color: #5a4a3a;
-      cursor: pointer;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      backdrop-filter: blur(6px);
-      white-space: nowrap;
-    }
 
     /* ========== TOC OVERLAY ========== */
     #toc-overlay {
@@ -764,6 +740,26 @@
     .contact-row:last-of-type { border-bottom: none; }
     .contact-who { color: #3a3a3a; }
     .contact-role { font-size: 0.72rem; color: #aaa; margin-top: 1px; }
+    .contact-actions {
+      display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+    }
+    .call-icon {
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      background: #f0f6f0; border: 1px solid #a8c8a8; border-radius: 50%;
+      font-size: 15px; text-decoration: none; line-height: 1;
+    }
+    .edit-icon-btn {
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      background: #f5f0eb; border: 1px solid #c8b8a8; border-radius: 50%;
+      font-size: 14px; cursor: pointer; line-height: 1;
+    }
+    .edit-account-btn {
+      background: none; border: none; font-size: 14px;
+      cursor: pointer; padding: 4px; opacity: 0.45; flex-shrink: 0;
+    }
+    .edit-account-btn:hover, .edit-account-btn:active { opacity: 1; }
     .call-link {
       padding: 6px 14px;
       border: 1px solid #c8b8a8;
@@ -947,7 +943,7 @@
 <!-- ████ 6. MAP ████ -->
 <section id="map" class="section section-alt">
   <span class="section-label-kr">오 시 는 길</span>
-  <p class="map-venue-name">부천 MJ 컨벤션</p>
+  <p class="map-venue-name">MJ 컨벤션</p>
   <p class="map-venue-addr">5층 그랜드볼룸</p>
 
   <div class="kakaomap-wrap">
@@ -1005,16 +1001,20 @@
     <div class="account-row">
       <div class="account-info">
         <div class="account-name">주예찬</div>
-        <div class="account-bank">은행명 추가 예정</div>
+        <div class="account-bank" id="bank-yechan">—</div>
       </div>
-      <div class="account-num">—</div>
+      <div class="account-num" id="num-yechan">—</div>
+      <button class="copy-btn" onclick="copyNum(this,'num-yechan')">복사</button>
+      <button class="edit-account-btn" onclick="editAccount('yechan')">✏️</button>
     </div>
     <div class="account-row">
       <div class="account-info">
         <div class="account-name">주기곤</div>
-        <div class="account-bank">은행명 추가 예정</div>
+        <div class="account-bank" id="bank-groom-dad">—</div>
       </div>
-      <div class="account-num">—</div>
+      <div class="account-num" id="num-groom-dad">—</div>
+      <button class="copy-btn" onclick="copyNum(this,'num-groom-dad')">복사</button>
+      <button class="edit-account-btn" onclick="editAccount('groom-dad')">✏️</button>
     </div>
   </div>
 
@@ -1023,27 +1023,24 @@
     <div class="account-row">
       <div class="account-info">
         <div class="account-name">권지혜</div>
-        <div class="account-bank">은행명 추가 예정</div>
+        <div class="account-bank" id="bank-jihye">—</div>
       </div>
-      <div class="account-num">—</div>
+      <div class="account-num" id="num-jihye">—</div>
+      <button class="copy-btn" onclick="copyNum(this,'num-jihye')">복사</button>
+      <button class="edit-account-btn" onclick="editAccount('jihye')">✏️</button>
     </div>
     <div class="account-row">
       <div class="account-info">
         <div class="account-name">권영만</div>
-        <div class="account-bank">은행명 추가 예정</div>
+        <div class="account-bank" id="bank-bride-dad">—</div>
       </div>
-      <div class="account-num">—</div>
+      <div class="account-num" id="num-bride-dad">—</div>
+      <button class="copy-btn" onclick="copyNum(this,'num-bride-dad')">복사</button>
+      <button class="edit-account-btn" onclick="editAccount('bride-dad')">✏️</button>
     </div>
   </div>
 </section>
 
-
-<!-- ████ FLOATING RSVP ████ -->
-<div id="rsvp-float">
-  <button class="rsvp-pill" onclick="alert('참석 여부 기능은 별도 연동이 필요합니다.')">
-    👤 참석 여부 알리기
-  </button>
-</div>
 
 <!-- ████ BOTTOM NAV ████ -->
 <nav id="bottom-nav">
@@ -1088,29 +1085,47 @@
     <div class="contact-sep">신랑측</div>
     <div class="contact-row">
       <div><div class="contact-who">주예찬</div><div class="contact-role">신랑</div></div>
-      <a href="tel:010-0000-0000" class="call-link">전화하기</a>
+      <div class="contact-actions">
+        <a href="tel:010-0000-0000" class="call-icon" id="call-yechan">📞</a>
+        <button class="edit-icon-btn" onclick="editPhone('yechan')">✏️</button>
+      </div>
     </div>
     <div class="contact-row">
       <div><div class="contact-who">주기곤</div><div class="contact-role">신랑 아버지</div></div>
-      <a href="tel:010-0000-0000" class="call-link">전화하기</a>
+      <div class="contact-actions">
+        <a href="tel:010-0000-0000" class="call-icon" id="call-groom-dad">📞</a>
+        <button class="edit-icon-btn" onclick="editPhone('groom-dad')">✏️</button>
+      </div>
     </div>
     <div class="contact-row">
       <div><div class="contact-who">김미옥</div><div class="contact-role">신랑 어머니</div></div>
-      <a href="tel:010-0000-0000" class="call-link">전화하기</a>
+      <div class="contact-actions">
+        <a href="tel:010-0000-0000" class="call-icon" id="call-groom-mom">📞</a>
+        <button class="edit-icon-btn" onclick="editPhone('groom-mom')">✏️</button>
+      </div>
     </div>
 
     <div class="contact-sep">신부측</div>
     <div class="contact-row">
       <div><div class="contact-who">권지혜</div><div class="contact-role">신부</div></div>
-      <a href="tel:010-0000-0000" class="call-link">전화하기</a>
+      <div class="contact-actions">
+        <a href="tel:010-0000-0000" class="call-icon" id="call-jihye">📞</a>
+        <button class="edit-icon-btn" onclick="editPhone('jihye')">✏️</button>
+      </div>
     </div>
     <div class="contact-row">
       <div><div class="contact-who">권영만</div><div class="contact-role">신부 아버지</div></div>
-      <a href="tel:010-0000-0000" class="call-link">전화하기</a>
+      <div class="contact-actions">
+        <a href="tel:010-0000-0000" class="call-icon" id="call-bride-dad">📞</a>
+        <button class="edit-icon-btn" onclick="editPhone('bride-dad')">✏️</button>
+      </div>
     </div>
     <div class="contact-row">
       <div><div class="contact-who">김정희</div><div class="contact-role">신부 어머니</div></div>
-      <a href="tel:010-0000-0000" class="call-link">전화하기</a>
+      <div class="contact-actions">
+        <a href="tel:010-0000-0000" class="call-icon" id="call-bride-mom">📞</a>
+        <button class="edit-icon-btn" onclick="editPhone('bride-mom')">✏️</button>
+      </div>
     </div>
 
     <button class="modal-close-btn" onclick="closeContact()">닫기</button>
@@ -1491,13 +1506,61 @@ function shareCard() {
 }
 
 // ===== ACCOUNT COPY =====
-function copyAcct(btn, num) {
+function copyNum(btn, numId) {
+  const num = document.getElementById(numId)?.textContent?.trim();
+  if (!num || num === '—') return;
   navigator.clipboard.writeText(num).then(() => {
     btn.textContent = '완료!';
     btn.classList.add('done');
     setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('done'); }, 2000);
   });
 }
+
+// ===== PHONE EDIT =====
+const PHONE_IDS = ['yechan','groom-dad','groom-mom','jihye','bride-dad','bride-mom'];
+function loadPhones() {
+  PHONE_IDS.forEach(id => {
+    const saved = localStorage.getItem(`phone_${id}`);
+    if (saved) {
+      const el = document.getElementById(`call-${id}`);
+      if (el) el.href = `tel:${saved}`;
+    }
+  });
+}
+function editPhone(id) {
+  const el = document.getElementById(`call-${id}`);
+  const current = el ? el.getAttribute('href').replace('tel:', '') : '';
+  const num = prompt('전화번호 입력 (예: 010-1234-5678)', current === '010-0000-0000' ? '' : current);
+  if (num === null) return;
+  const val = num.trim();
+  if (el) el.href = `tel:${val || '010-0000-0000'}`;
+  if (val) localStorage.setItem(`phone_${id}`, val);
+}
+loadPhones();
+
+// ===== ACCOUNT EDIT =====
+const ACCOUNT_IDS = ['yechan','groom-dad','jihye','bride-dad'];
+function loadAccounts() {
+  ACCOUNT_IDS.forEach(id => {
+    const bank = localStorage.getItem(`acc_bank_${id}`);
+    const num  = localStorage.getItem(`acc_num_${id}`);
+    if (bank) { const el = document.getElementById(`bank-${id}`); if (el) el.textContent = bank; }
+    if (num)  { const el = document.getElementById(`num-${id}`);  if (el) el.textContent = num; }
+  });
+}
+function editAccount(id) {
+  const bankEl = document.getElementById(`bank-${id}`);
+  const numEl  = document.getElementById(`num-${id}`);
+  const bank = prompt('은행명 입력 (예: 카카오뱅크)', bankEl?.textContent === '—' ? '' : bankEl?.textContent || '');
+  if (bank === null) return;
+  const num  = prompt('계좌번호 입력 (예: 3333-01-1234567)', numEl?.textContent === '—' ? '' : numEl?.textContent || '');
+  if (num === null) return;
+  if (bankEl) bankEl.textContent = bank || '—';
+  if (numEl)  numEl.textContent  = num  || '—';
+  if (bank) localStorage.setItem(`acc_bank_${id}`, bank);
+  if (num)  localStorage.setItem(`acc_num_${id}`,  num);
+}
+loadAccounts();
 </script>
 </body>
 </html>
