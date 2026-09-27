@@ -1031,7 +1031,6 @@ async function uploadPhoto(file, key, imgId, phId, upId) {
   formData.append('file', file);
   formData.append('upload_preset', UPLOAD_PRESET);
   formData.append('public_id', `wedding/${key}`);
-  formData.append('overwrite', 'true');
 
   try {
     const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
@@ -1171,7 +1170,6 @@ bgmFileEl.addEventListener('change', async function () {
   formData.append('file', file);
   formData.append('upload_preset', UPLOAD_PRESET);
   formData.append('public_id', 'wedding/bgm');
-  formData.append('overwrite', 'true');
 
   try {
     const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, {
