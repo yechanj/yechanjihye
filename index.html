@@ -24,11 +24,9 @@
     /* ========== PHOTO SLOT ========== */
     .photo-slot {
       position: relative;
-      cursor: pointer;
       overflow: hidden;
       display: block;
     }
-    .photo-slot input[type="file"] { display: none; }
     .photo-slot img {
       width: 100%;
       height: 100%;
@@ -638,15 +636,15 @@
 
 <!-- ████ 1. HERO ████ -->
 <section id="hero">
-  <label id="hero-cover" class="photo-slot" for="hero-file">
-    <img id="hero-img" alt="커버 사진">
+  <div id="hero-cover" class="photo-slot">
+    <img id="hero-img" src="photos/cover.jpg" alt="커버 사진"
+         onload="this.classList.add('loaded'); document.getElementById('hero-ph').style.display='none'"
+         onerror="this.style.display='none'">
     <div class="photo-placeholder" id="hero-ph">
       <span class="ph-icon">📷</span>
-      <p>커버 사진 선택</p>
-      <small>클릭하여 JPG 파일 추가</small>
+      <p>photos/cover.jpg</p>
     </div>
-    <input type="file" id="hero-file" accept="image/*">
-  </label>
+  </div>
   <div class="overlay"></div>
   <div id="particles"></div>
   <div class="hero-title-top">we're getting married</div>
@@ -677,15 +675,15 @@
 
   <div class="polaroid-wrap">
     <div class="polaroid">
-      <label class="photo-slot" id="poem-slot" for="poem-file">
-        <img id="poem-img" alt="웨딩 사진">
+      <div class="photo-slot" id="poem-slot">
+        <img id="poem-img" src="photos/poem.jpg" alt="웨딩 사진"
+             onload="this.classList.add('loaded'); document.getElementById('poem-ph').style.display='none'"
+             onerror="this.style.display='none'">
         <div class="photo-placeholder" id="poem-ph">
           <span class="ph-icon">📷</span>
-          <p>사진 선택</p>
-          <small>클릭하여 추가</small>
+          <p>photos/poem.jpg</p>
         </div>
-        <input type="file" id="poem-file" accept="image/*">
-      </label>
+      </div>
     </div>
   </div>
 </section>
@@ -729,25 +727,25 @@
 <!-- ████ 4. COUPLE PHOTOS ████ -->
 <section id="couple" class="section section-alt">
   <div class="couple-grid">
-    <label class="couple-photo photo-slot" id="groom-slot" for="groom-file">
-      <img id="groom-img" alt="신랑">
+    <div class="couple-photo photo-slot" id="groom-slot">
+      <img id="groom-img" src="photos/groom.jpg" alt="신랑"
+           onload="this.classList.add('loaded'); document.getElementById('groom-ph').style.display='none'"
+           onerror="this.style.display='none'">
       <div class="photo-placeholder" id="groom-ph">
         <span class="ph-icon">📷</span>
-        <p>신랑 사진</p>
-        <small>클릭하여 추가</small>
+        <p>photos/groom.jpg</p>
       </div>
-      <input type="file" id="groom-file" accept="image/*">
-    </label>
+    </div>
     <div class="couple-heart">♥</div>
-    <label class="couple-photo photo-slot" id="bride-slot" for="bride-file">
-      <img id="bride-img" alt="신부">
+    <div class="couple-photo photo-slot" id="bride-slot">
+      <img id="bride-img" src="photos/bride.jpg" alt="신부"
+           onload="this.classList.add('loaded'); document.getElementById('bride-ph').style.display='none'"
+           onerror="this.style.display='none'">
       <div class="photo-placeholder" id="bride-ph">
         <span class="ph-icon">📷</span>
-        <p>신부 사진</p>
-        <small>클릭하여 추가</small>
+        <p>photos/bride.jpg</p>
       </div>
-      <input type="file" id="bride-file" accept="image/*">
-    </label>
+    </div>
   </div>
   <div class="couple-names-row">
     <span class="name-groom">신랑 주예찬</span>
@@ -804,26 +802,30 @@
 <section id="gallery" class="section">
   <span class="section-label-en">Gallery</span>
   <div class="gallery-grid">
-    <label class="gallery-item photo-slot" id="g1-slot" for="g1-file">
-      <img id="g1-img" alt="갤러리1">
-      <div class="photo-placeholder" id="g1-ph"><span class="ph-icon">📷</span><p>사진 1</p></div>
-      <input type="file" id="g1-file" accept="image/*">
-    </label>
-    <label class="gallery-item photo-slot" id="g2-slot" for="g2-file">
-      <img id="g2-img" alt="갤러리2">
-      <div class="photo-placeholder" id="g2-ph"><span class="ph-icon">📷</span><p>사진 2</p></div>
-      <input type="file" id="g2-file" accept="image/*">
-    </label>
-    <label class="gallery-item photo-slot" id="g3-slot" for="g3-file">
-      <img id="g3-img" alt="갤러리3">
-      <div class="photo-placeholder" id="g3-ph"><span class="ph-icon">📷</span><p>사진 3</p></div>
-      <input type="file" id="g3-file" accept="image/*">
-    </label>
-    <label class="gallery-item photo-slot" id="g4-slot" for="g4-file">
-      <img id="g4-img" alt="갤러리4">
-      <div class="photo-placeholder" id="g4-ph"><span class="ph-icon">📷</span><p>사진 4</p></div>
-      <input type="file" id="g4-file" accept="image/*">
-    </label>
+    <div class="gallery-item photo-slot" id="g1-slot">
+      <img src="photos/gallery1.jpg" alt="갤러리1"
+           onload="this.classList.add('loaded'); document.getElementById('g1-ph').style.display='none'"
+           onerror="this.style.display='none'">
+      <div class="photo-placeholder" id="g1-ph"><span class="ph-icon">📷</span><p>photos/gallery1.jpg</p></div>
+    </div>
+    <div class="gallery-item photo-slot" id="g2-slot">
+      <img src="photos/gallery2.jpg" alt="갤러리2"
+           onload="this.classList.add('loaded'); document.getElementById('g2-ph').style.display='none'"
+           onerror="this.style.display='none'">
+      <div class="photo-placeholder" id="g2-ph"><span class="ph-icon">📷</span><p>photos/gallery2.jpg</p></div>
+    </div>
+    <div class="gallery-item photo-slot" id="g3-slot">
+      <img src="photos/gallery3.jpg" alt="갤러리3"
+           onload="this.classList.add('loaded'); document.getElementById('g3-ph').style.display='none'"
+           onerror="this.style.display='none'">
+      <div class="photo-placeholder" id="g3-ph"><span class="ph-icon">📷</span><p>photos/gallery3.jpg</p></div>
+    </div>
+    <div class="gallery-item photo-slot" id="g4-slot">
+      <img src="photos/gallery4.jpg" alt="갤러리4"
+           onload="this.classList.add('loaded'); document.getElementById('g4-ph').style.display='none'"
+           onerror="this.style.display='none'">
+      <div class="photo-placeholder" id="g4-ph"><span class="ph-icon">📷</span><p>photos/gallery4.jpg</p></div>
+    </div>
   </div>
 </section>
 
@@ -948,64 +950,24 @@
 </div>
 
 <script>
-// ===== PHOTO SLOTS (IndexedDB 저장/복원) =====
-const PHOTO_KEYS = [
-  ['hero-file',  'hero-img',  'hero-ph'],
-  ['poem-file',  'poem-img',  'poem-ph'],
-  ['groom-file', 'groom-img', 'groom-ph'],
-  ['bride-file', 'bride-img', 'bride-ph'],
-  ['g1-file', 'g1-img', 'g1-ph'],
-  ['g2-file', 'g2-img', 'g2-ph'],
-  ['g3-file', 'g3-img', 'g3-ph'],
-  ['g4-file', 'g4-img', 'g4-ph'],
-];
-
-function applyPhoto(imgEl, phEl, src) {
-  imgEl.src = src;
-  imgEl.classList.add('loaded');
-  if (phEl) phEl.style.display = 'none';
-}
-
-// IndexedDB — localStorage(~5MB)보다 훨씬 큰 용량 지원
+// ===== IndexedDB (BGM 저장용) =====
 const DB_READY = new Promise((resolve, reject) => {
   const req = indexedDB.open('wedding_card_v1', 1);
   req.onupgradeneeded = e => e.target.result.createObjectStore('photos');
   req.onsuccess    = e => resolve(e.target.result);
   req.onerror      = ()  => reject(req.error);
 });
-
 function dbSave(key, dataUrl) {
   DB_READY.then(db => {
     db.transaction('photos', 'readwrite').objectStore('photos').put(dataUrl, key);
   }).catch(() => {});
 }
-
 function dbLoad(key, cb) {
   DB_READY.then(db => {
     const req = db.transaction('photos', 'readonly').objectStore('photos').get(key);
     req.onsuccess = () => { if (req.result) cb(req.result); };
   }).catch(() => {});
 }
-
-PHOTO_KEYS.forEach(([fileId, imgId, phId]) => {
-  const fileEl = document.getElementById(fileId);
-  const imgEl  = document.getElementById(imgId);
-  const phEl   = document.getElementById(phId);
-
-  // 페이지 로드 시 저장된 사진 복원
-  dbLoad(fileId, src => applyPhoto(imgEl, phEl, src));
-
-  // 새 사진 선택 시 IndexedDB에 저장
-  fileEl.addEventListener('change', function () {
-    if (!this.files[0]) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      dbSave(fileId, e.target.result);
-      applyPhoto(imgEl, phEl, e.target.result);
-    };
-    reader.readAsDataURL(this.files[0]);
-  });
-});
 
 // ===== PARTICLES =====
 (function spawnParticles() {
