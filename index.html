@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>모바일 청첩장</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Nanum+Myeongjo:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* ========== RESET ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Nanum Myeongjo', serif;
+      background: #fafaf8;
+      color: #3a3a3a;
+      max-width: 480px;
+      margin: 0 auto;
+      overflow-x: hidden;
+      padding-bottom: 72px;
+    }
+
+    /* ========== PHOTO SLOT ========== */
+    .photo-slot {
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      display: block;
+    }
+    .photo-slot input[type="file"] { display: none; }
+    .photo-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .photo-slot img.loaded { display: block; }
+    .photo-placeholder {
+      width: 100%;
+      height: 100%;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #e4e0da;
+      gap: 5px;
+    }
+    .photo-placeholder .ph-icon { font-size: 26px; opacity: 0.55; }
+    .photo-placeholder p { font-size: 12px; color: #888; }
+    .photo-placeholder small { font-size: 10px; color: #aaa; }
+
+    /* ========== SECTION BASE ========== */
+    .section {
+      padding: 52px 28px;
+      background: #ffffff;
+      border-bottom: 1px solid #ede8e2;
+    }
+    .section-alt { background: #fafaf8; }
+    .section-label-en {
+      font-family: 'Great Vibes', cursive;
+      font-size: 1.9rem;
+      color: #8a7a68;
+      display: block;
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .section-label-kr {
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      color: #9a8a78;
+      display: block;
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    /* ========== HERO ========== */
+    #hero {
+      position: relative;
+      height: 100svh;
+      min-height: 600px;
+      overflow: hidden;
+      background: #2d3a2d;
+    }
+    #hero-cover {
+      position: absolute;
+      inset: 0;
+    }
+    #hero-cover .photo-placeholder {
+      background: linear-gradient(160deg, #3d5240 0%, #253028 100%);
+    }
+    #hero-cover .photo-placeholder .ph-icon { font-size: 40px; }
+    #hero-cover .photo-placeholder p { color: #b8ccb8; }
+    #hero-cover .photo-placeholder small { color: #8aaa8a; }
+    #hero .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.06) 0%,
+        rgba(0,0,0,0.04) 45%,
+        rgba(0,0,0,0.48) 100%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+    #particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      top: -30px;
+      animation: fallDown linear infinite;
+    }
+    .particle-flower {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.92);
+      box-shadow:
+        0 -7px 0 1.8px rgba(255,255,255,0.85),
+        0  7px 0 1.8px rgba(255,255,255,0.85),
+        -7px 0 0 1.8px rgba(255,255,255,0.85),
+         7px 0 0 1.8px rgba(255,255,255,0.85);
+    }
+    .particle-leaf {
+      background: #a8d080;
+      border-radius: 0 80% 0 80%;
+    }
+    @keyframes fallDown {
+      0%   { transform: translateY(0)     rotate(0deg)   translateX(0);    opacity: 0.9; }
+      40%  { transform: translateY(40vh)  rotate(140deg) translateX(12px);  opacity: 0.75; }
+      100% { transform: translateY(108vh) rotate(330deg) translateX(-6px); opacity: 0; }
+    }
+    .hero-title-top {
+      position: absolute;
+      top: 44px;
+      left: 0; right: 0;
+      text-align: center;
+      font-family: 'Great Vibes', cursive;
+      font-size: 2.7rem;
+      color: #ffffff;
+      text-shadow: 0 2px 14px rgba(0,0,0,0.22);
+      z-index: 3;
+      pointer-events: none;
+      letter-spacing: 1px;
+    }
+    .hero-content {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 0 24px 88px;
+      text-align: center;
+      color: #ffffff;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .hero-names {
+      font-size: 0.95rem;
+      letter-spacing: 3px;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.3);
+      margin-bottom: 8px;
+    }
+    .hero-date {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: 3px;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.3);
+      margin-bottom: 14px;
+    }
+    .hero-subtitle {
+      font-size: 0.7rem;
+      line-height: 1.85;
+      color: rgba(255,255,255,0.87);
+      text-shadow: 0 1px 4px rgba(0,0,0,0.28);
+      max-width: 310px;
+      margin: 0 auto;
+    }
+
+    /* ========== POEM ========== */
+    #poem { padding: 52px 24px; }
+    .poem-body { text-align: center; }
+    .poem-line {
+      font-size: 0.92rem;
+      line-height: 1.95;
+      color: #3a3a3a;
+      letter-spacing: 0.4px;
+    }
+    .poem-divider {
+      border: none;
+      border-top: 1px solid #e4ddd6;
+      margin: 15px auto;
+      width: 68%;
+    }
+    .poem-citation {
+      font-size: 0.78rem;
+      color: #9a8a78;
+      margin-top: 22px;
+      letter-spacing: 0.5px;
+    }
+    .polaroid-wrap {
+      margin: 40px auto 0;
+      max-width: 260px;
+    }
+    .polaroid {
+      background: #fff;
+      padding: 9px 9px 36px;
+      box-shadow: 0 4px 22px rgba(0,0,0,0.13), 0 1px 5px rgba(0,0,0,0.07);
+      transform: rotate(-1.8deg);
+    }
+    .polaroid .photo-slot { aspect-ratio: 4/3; }
+
+    /* ========== INVITE ========== */
+    #invite { text-align: center; }
+    .invite-text {
+      font-size: 0.92rem;
+      line-height: 2.3;
+      color: #3a3a3a;
+      letter-spacing: 0.2px;
+      margin-bottom: 36px;
+    }
+    .parents { margin: 0 auto 32px; }
+    .parent-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 6px;
+      font-size: 0.86rem;
+      flex-wrap: wrap;
+    }
+    .parent-sep { color: #c0b0a0; font-size: 0.75rem; }
+    .parent-role { color: #888; font-size: 0.78rem; }
+    .parent-child { font-size: 1rem; font-weight: 700; color: #3a3a3a; margin-left: 2px; }
+    .parent-baptism {
+      font-size: 0.7rem;
+      color: #b0a090;
+      text-align: center;
+      margin-bottom: 18px;
+      letter-spacing: 0.5px;
+    }
+    .deceased { color: #e8a060; margin-right: 2px; }
+    .btn {
+      display: inline-block;
+      padding: 12px 30px;
+      border: 1px solid #c8b8a8;
+      background: #f5f0eb;
+      color: #5a4a3a;
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.18s;
+      text-decoration: none;
+    }
+    .btn:hover { background: #ece4dc; }
+
+    /* ========== COUPLE PHOTOS ========== */
+    #couple { text-align: center; }
+    .couple-grid {
+      display: grid;
+      grid-template-columns: 1fr 32px 1fr;
+      align-items: center;
+    }
+    .couple-photo { aspect-ratio: 3/4; }
+    .couple-heart { font-size: 18px; color: #d07878; text-align: center; }
+    .couple-names-row {
+      display: grid;
+      grid-template-columns: 1fr 32px 1fr;
+      margin-top: 12px;
+      font-size: 0.83rem;
+    }
+    .name-groom { color: #5a6a8a; text-align: center; }
+    .name-bride { color: #8a6a7a; text-align: center; }
+
+    /* ========== CALENDAR ========== */
+    #calendar { text-align: center; }
+    .mini-calendar {
+      margin: 0 auto 28px;
+      max-width: 256px;
+      border: 1px solid #e4ddd6;
+      padding: 18px 12px;
+    }
+    .mini-cal-month {
+      font-size: 0.78rem;
+      letter-spacing: 2px;
+      color: #8a7a68;
+      margin-bottom: 14px;
+    }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      text-align: center;
+    }
+    .cal-head { font-size: 0.68rem; color: #b0a898; padding: 3px 0; }
+    .cal-head.sun { color: #c87878; }
+    .cal-head.sat { color: #8888c8; }
+    .cal-day { font-size: 0.75rem; color: #5a5a5a; padding: 4px 0; }
+    .cal-day.sun { color: #c87878; }
+    .cal-day.sat { color: #8888c8; }
+    .cal-day.empty { color: transparent; }
+    .cal-day.today {
+      background: #3a3a3a;
+      color: #fff;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+      margin: 0 auto;
+    }
+    .cal-date {
+      font-size: 0.95rem;
+      line-height: 2.1;
+      color: #3a3a3a;
+    }
+    .cal-venue {
+      font-size: 0.93rem;
+      color: #5a4a3a;
+      margin-top: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    /* ========== MAP ========== */
+    #map { text-align: center; }
+    .map-venue-name { font-size: 1rem; color: #3a3a3a; margin-bottom: 4px; }
+    .map-venue-addr { font-size: 0.78rem; color: #999; margin-bottom: 18px; }
+    .kakaomap-wrap {
+      width: 100%;
+      height: 360px;   /* mapHeight와 동일 — 하단 바 잘라냄 */
+      overflow: hidden;
+      margin-bottom: 20px;
+      border: 1px solid #e4ddd6;
+    }
+    .kakaomap-wrap .root_daum_roughmap { width: 100% !important; }
+    .kakaomap-wrap img { max-width: 100%; }
+    /* 카카오맵 하단 버튼바(로드뷰·길찾기·주소 등) 숨김 */
+    .kakaomap-wrap .wrap_map_btn,
+    .kakaomap-wrap .link_roughmap,
+    .kakaomap-wrap .wrap_roughmap_footer,
+    .kakaomap-wrap [class*="footer"],
+    .kakaomap-wrap [class*="map_btn"],
+    .kakaomap-wrap [class*="roughmap_bottom"] { display: none !important; }
+    .map-placeholder {
+      width: 100%;
+      aspect-ratio: 16/8;
+      background: #e8e4de;
+      border: 1px dashed #c8bfb5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      color: #9a9088;
+    }
+    .map-placeholder .map-icon { font-size: 30px; }
+    .map-placeholder p { font-size: 0.82rem; }
+    .map-placeholder small { font-size: 0.7rem; color: #b0a898; }
+    .map-address {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin: 14px 0 18px;
+      padding: 12px 0;
+      border-top: 1px solid #e8e2db;
+      border-bottom: 1px solid #e8e2db;
+      font-size: 0.8rem;
+      color: #7a6a5a;
+      letter-spacing: 0.5px;
+    }
+    .map-address-pin { color: #b0a090; font-size: 0.75rem; }
+    .map-btns { display: flex; gap: 10px; justify-content: center; }
+    .map-btns .btn { font-size: 0.8rem; padding: 10px 20px; }
+
+    /* ========== GALLERY ========== */
+    #gallery { padding: 52px 14px; }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .gallery-item { aspect-ratio: 1; }
+
+    /* ========== ACCOUNT ========== */
+    #account {}
+    .account-card {
+      background: #fff;
+      border: 1px solid #e4ddd6;
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+    .account-card-title {
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      color: #9a8a78;
+      border-bottom: 1px solid #f0ece6;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+    .account-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .account-row:last-child { margin-bottom: 0; }
+    .account-info { flex: 1; }
+    .account-name { font-size: 0.88rem; color: #3a3a3a; }
+    .account-bank { font-size: 0.72rem; color: #aaa; margin-top: 2px; }
+    .account-num {
+      flex: 1;
+      text-align: center;
+      font-size: 0.82rem;
+      color: #5a4a3a;
+      letter-spacing: 0.5px;
+    }
+    .copy-btn {
+      font-size: 0.7rem;
+      color: #8a7a68;
+      border: 1px solid #c8b8a8;
+      background: #f5f0eb;
+      padding: 5px 10px;
+      border-radius: 2px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .copy-btn.done { color: #6a9a6a; border-color: #9aba9a; background: #f0f6f0; }
+
+    /* ========== MUSIC BANNER ========== */
+    #music-banner {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(-110%);
+      transition: transform 0.38s cubic-bezier(0.34, 1.26, 0.64, 1);
+      background: rgba(30, 30, 30, 0.82);
+      backdrop-filter: blur(10px);
+      color: rgba(255,255,255,0.92);
+      padding: 8px 18px 8px 14px;
+      border-radius: 0 0 18px 18px;
+      font-size: 0.75rem;
+      letter-spacing: 0.4px;
+      z-index: 150;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      max-width: calc(100vw - 32px);
+    }
+    #music-banner.visible {
+      transform: translateX(-50%) translateY(0);
+    }
+    .music-note {
+      font-size: 13px;
+      animation: notePulse 1.4s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes notePulse {
+      0%, 100% { opacity: 1;   transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.85); }
+    }
+    #music-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ========== BOTTOM NAV ========== */
+    #bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      height: 56px;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid #e4ddd6;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 100;
+    }
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+      padding: 6px 22px;
+      background: none;
+      border: none;
+      color: #7a6a5a;
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.5px;
+    }
+    .nav-icon { font-size: 17px; line-height: 1; }
+    .nav-div { width: 1px; height: 22px; background: #e0d8d0; }
+
+    /* ========== FLOATING RSVP ========== */
+    #rsvp-float {
+      position: fixed;
+      bottom: 64px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 99;
+    }
+    .rsvp-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 20px;
+      background: rgba(255,255,255,0.96);
+      border: 1px solid #c8b8a8;
+      border-radius: 24px;
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.8rem;
+      color: #5a4a3a;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      backdrop-filter: blur(6px);
+      white-space: nowrap;
+    }
+
+    /* ========== TOC OVERLAY ========== */
+    #toc-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.48);
+      z-index: 200;
+      align-items: flex-end;
+    }
+    #toc-overlay.open { display: flex; }
+    #toc-panel {
+      background: #fff;
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 22px 24px 44px;
+      border-radius: 14px 14px 0 0;
+    }
+    .toc-heading { font-size: 0.72rem; letter-spacing: 2px; color: #aaa; margin-bottom: 14px; }
+    .toc-list { list-style: none; }
+    .toc-list li a {
+      display: block;
+      padding: 13px 0;
+      font-size: 0.93rem;
+      color: #3a3a3a;
+      text-decoration: none;
+      border-bottom: 1px solid #f0ece6;
+    }
+    .toc-list li:last-child a { border-bottom: none; }
+
+    /* ========== CONTACT MODAL ========== */
+    #contact-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.48);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+    }
+    #contact-modal.open { display: flex; }
+    #contact-panel {
+      background: #fff;
+      width: calc(100% - 48px);
+      max-width: 360px;
+      border-radius: 8px;
+      padding: 28px 22px 22px;
+    }
+    .contact-heading { text-align: center; font-size: 0.95rem; margin-bottom: 20px; color: #3a3a3a; }
+    .contact-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0ece6;
+      font-size: 0.86rem;
+    }
+    .contact-row:last-of-type { border-bottom: none; }
+    .contact-who { color: #3a3a3a; }
+    .contact-role { font-size: 0.72rem; color: #aaa; margin-top: 1px; }
+    .call-link {
+      padding: 6px 14px;
+      border: 1px solid #c8b8a8;
+      background: #f5f0eb;
+      color: #5a4a3a;
+      font-size: 0.78rem;
+      border-radius: 2px;
+      text-decoration: none;
+    }
+    .contact-sep {
+      font-size: 0.68rem;
+      letter-spacing: 2px;
+      color: #c0b0a0;
+      text-align: center;
+      padding: 10px 0 4px;
+    }
+    .modal-close-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      margin-top: 18px;
+      padding: 10px;
+      font-size: 0.82rem;
+      color: #aaa;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: 'Nanum Myeongjo', serif;
+    }
+  </style>
+</head>
+<body>
+
+<audio id="bgm" loop preload="auto"></audio>
+<input type="file" id="bgm-file" accept="audio/*" style="display:none">
+
+<!-- 상단 음악 배너 -->
+<div id="music-banner">
+  <span class="music-note">♪</span>
+  <span id="music-title">BGM</span>
+</div>
+
+<!-- ████ 1. HERO ████ -->
+<section id="hero">
+  <label id="hero-cover" class="photo-slot" for="hero-file">
+    <img id="hero-img" alt="커버 사진">
+    <div class="photo-placeholder" id="hero-ph">
+      <span class="ph-icon">📷</span>
+      <p>커버 사진 선택</p>
+      <small>클릭하여 JPG 파일 추가</small>
+    </div>
+    <input type="file" id="hero-file" accept="image/*">
+  </label>
+  <div class="overlay"></div>
+  <div id="particles"></div>
+  <div class="hero-title-top">we're getting married</div>
+  <div class="hero-content">
+    <div class="hero-names">권지혜 × 주예찬</div>
+    <div class="hero-date">2027. 03. 06</div>
+    <div class="hero-subtitle">
+      In a world of fleeting things, we have found something that holds —<br>
+      a love that listens, a promise that endures,<br>
+      and a future to build together, one day at a time.
+    </div>
+  </div>
+</section>
+
+<!-- ████ 2. POEM ████ -->
+<section id="poem" class="section">
+  <div class="poem-body">
+    <p class="poem-line">별을 보고 있으면</p>
+    <hr class="poem-divider">
+    <p class="poem-line">어둠을 두려워할 필요가 없잖아요</p>
+    <hr class="poem-divider">
+    <p class="poem-line">별이 아름답구나,</p>
+    <p class="poem-line">그 생각부터 하게되니까</p>
+    <hr class="poem-divider">
+    <p class="poem-line">우리, 그렇게 사랑해요</p>
+    <p class="poem-citation">— 정현주 &lt;그래도, 사랑&gt;</p>
+  </div>
+
+  <div class="polaroid-wrap">
+    <div class="polaroid">
+      <label class="photo-slot" id="poem-slot" for="poem-file">
+        <img id="poem-img" alt="웨딩 사진">
+        <div class="photo-placeholder" id="poem-ph">
+          <span class="ph-icon">📷</span>
+          <p>사진 선택</p>
+          <small>클릭하여 추가</small>
+        </div>
+        <input type="file" id="poem-file" accept="image/*">
+      </label>
+    </div>
+  </div>
+</section>
+
+<!-- ████ 3. INVITE ████ -->
+<section id="invite" class="section">
+  <span class="section-label-en">Invite you</span>
+
+  <p class="invite-text">
+    저희 두 사람이<br>
+    평생을 함께하기 위해<br>
+    서로의 반려자가 되려 합니다.<br>
+    <br>
+    그 진실한 서약을 하는 자리에<br>
+    소중한 분들을 모십니다.<br>
+    <br>
+    자리하시어 축복해 주시면<br>
+    대단히 감사하겠습니다.
+  </p>
+
+  <div class="parents">
+    <div class="parent-row">
+      <span>주기곤</span>
+      <span class="parent-sep">·</span>
+      <span>김미옥</span>
+      <span class="parent-role">의 차남</span>
+      <span class="parent-child">예찬</span>
+    </div>
+    <div class="parent-row" style="margin-top:14px;">
+      <span>권영만</span>
+      <span class="parent-sep">·</span>
+      <span>김정희</span>
+      <span class="parent-role">의 차녀</span>
+      <span class="parent-child">지혜</span>
+    </div>
+  </div>
+
+  <button class="btn" onclick="openContact()">연락하기</button>
+</section>
+
+<!-- ████ 4. COUPLE PHOTOS ████ -->
+<section id="couple" class="section section-alt">
+  <div class="couple-grid">
+    <label class="couple-photo photo-slot" id="groom-slot" for="groom-file">
+      <img id="groom-img" alt="신랑">
+      <div class="photo-placeholder" id="groom-ph">
+        <span class="ph-icon">📷</span>
+        <p>신랑 사진</p>
+        <small>클릭하여 추가</small>
+      </div>
+      <input type="file" id="groom-file" accept="image/*">
+    </label>
+    <div class="couple-heart">♥</div>
+    <label class="couple-photo photo-slot" id="bride-slot" for="bride-file">
+      <img id="bride-img" alt="신부">
+      <div class="photo-placeholder" id="bride-ph">
+        <span class="ph-icon">📷</span>
+        <p>신부 사진</p>
+        <small>클릭하여 추가</small>
+      </div>
+      <input type="file" id="bride-file" accept="image/*">
+    </label>
+  </div>
+  <div class="couple-names-row">
+    <span class="name-groom">신랑 주예찬</span>
+    <span></span>
+    <span class="name-bride">신부 권지혜</span>
+  </div>
+</section>
+
+<!-- ████ 5. CALENDAR ████ -->
+<section id="calendar" class="section">
+  <span class="section-label-en">Calendar</span>
+
+  <div class="mini-calendar">
+    <div class="mini-cal-month">MARCH 2027</div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+
+  <p class="cal-date">2027년 3월 6일 토요일 오후 4시 40분</p>
+  <p class="cal-venue" style="margin-top:8px;">부천 MJ 컨벤션 5층 그랜드볼룸</p>
+</section>
+
+<!-- ████ 6. MAP ████ -->
+<section id="map" class="section section-alt">
+  <span class="section-label-kr">오 시 는 길</span>
+  <p class="map-venue-name">부천 MJ 컨벤션</p>
+  <p class="map-venue-addr">5층 그랜드볼룸</p>
+
+  <div class="kakaomap-wrap">
+    <div id="daumRoughmapContainer1790467234580" class="root_daum_roughmap root_daum_roughmap_landing"></div>
+  </div>
+
+  <div class="map-address">
+    <span class="map-address-pin">◈</span>
+    <span>경기 부천시 소사구 경인로 386</span>
+  </div>
+
+  <div class="map-btns">
+    <a href="https://kko.to/35mSN32SBp" target="_blank" class="btn">카카오맵</a>
+    <a href="https://naver.me/xjgcfH6y" target="_blank" class="btn">네이버지도</a>
+  </div>
+
+  <script charset="UTF-8" class="daum_roughmap_loader_script" src="https://t1.kakaocdn.net/kakaomapweb/roughmap/loader/prod/roughmapLoader.js"></script>
+  <script charset="UTF-8">
+    new daum.roughmap.Lander({
+      "timestamp" : "1790467234580",
+      "key"       : "vetnycrmr6w",
+      "mapWidth"  : "640",
+      "mapHeight" : "360"
+    }).render();
+  </script>
+</section>
+
+<!-- ████ 7. GALLERY ████ -->
+<section id="gallery" class="section">
+  <span class="section-label-en">Gallery</span>
+  <div class="gallery-grid">
+    <label class="gallery-item photo-slot" id="g1-slot" for="g1-file">
+      <img id="g1-img" alt="갤러리1">
+      <div class="photo-placeholder" id="g1-ph"><span class="ph-icon">📷</span><p>사진 1</p></div>
+      <input type="file" id="g1-file" accept="image/*">
+    </label>
+    <label class="gallery-item photo-slot" id="g2-slot" for="g2-file">
+      <img id="g2-img" alt="갤러리2">
+      <div class="photo-placeholder" id="g2-ph"><span class="ph-icon">📷</span><p>사진 2</p></div>
+      <input type="file" id="g2-file" accept="image/*">
+    </label>
+    <label class="gallery-item photo-slot" id="g3-slot" for="g3-file">
+      <img id="g3-img" alt="갤러리3">
+      <div class="photo-placeholder" id="g3-ph"><span class="ph-icon">📷</span><p>사진 3</p></div>
+      <input type="file" id="g3-file" accept="image/*">
+    </label>
+    <label class="gallery-item photo-slot" id="g4-slot" for="g4-file">
+      <img id="g4-img" alt="갤러리4">
+      <div class="photo-placeholder" id="g4-ph"><span class="ph-icon">📷</span><p>사진 4</p></div>
+      <input type="file" id="g4-file" accept="image/*">
+    </label>
+  </div>
+</section>
+
+<!-- ████ 8. ACCOUNT ████ -->
+<section id="account" class="section section-alt">
+  <span class="section-label-kr">마 음 전 하 기</span>
+
+  <div class="account-card">
+    <div class="account-card-title">신랑측</div>
+    <div class="account-row">
+      <div class="account-info">
+        <div class="account-name">주예찬</div>
+        <div class="account-bank">은행명 추가 예정</div>
+      </div>
+      <div class="account-num">—</div>
+    </div>
+    <div class="account-row">
+      <div class="account-info">
+        <div class="account-name">주기곤</div>
+        <div class="account-bank">은행명 추가 예정</div>
+      </div>
+      <div class="account-num">—</div>
+    </div>
+  </div>
+
+  <div class="account-card">
+    <div class="account-card-title">신부측</div>
+    <div class="account-row">
+      <div class="account-info">
+        <div class="account-name">권지혜</div>
+        <div class="account-bank">은행명 추가 예정</div>
+      </div>
+      <div class="account-num">—</div>
+    </div>
+    <div class="account-row">
+      <div class="account-info">
+        <div class="account-name">권영만</div>
+        <div class="account-bank">은행명 추가 예정</div>
+      </div>
+      <div class="account-num">—</div>
+    </div>
+  </div>
+</section>
+
+<!-- ████ FLOATING RSVP ████ -->
+<div id="rsvp-float">
+  <button class="rsvp-pill" onclick="alert('참석 여부 기능은 별도 연동이 필요합니다.')">
+    👤 참석 여부 알리기
+  </button>
+</div>
+
+<!-- ████ BOTTOM NAV ████ -->
+<nav id="bottom-nav">
+  <button class="nav-btn" id="sound-btn" onclick="toggleSound()">
+    <span class="nav-icon" id="sound-icon">🔇</span>
+    <span>소리</span>
+  </button>
+  <div class="nav-div"></div>
+  <button class="nav-btn" onclick="openToc()">
+    <span class="nav-icon">☰</span>
+    <span>목차</span>
+  </button>
+  <div class="nav-div"></div>
+  <button class="nav-btn" onclick="shareCard()">
+    <span class="nav-icon">⬆</span>
+    <span>공유</span>
+  </button>
+</nav>
+
+<!-- ████ TOC OVERLAY ████ -->
+<div id="toc-overlay" onclick="closeToc()">
+  <div id="toc-panel" onclick="event.stopPropagation()">
+    <div class="toc-heading">목 차</div>
+    <ul class="toc-list">
+      <li><a href="#hero"     onclick="closeToc()">커버</a></li>
+      <li><a href="#poem"     onclick="closeToc()">시</a></li>
+      <li><a href="#invite"   onclick="closeToc()">청첩 인사</a></li>
+      <li><a href="#couple"   onclick="closeToc()">신랑 · 신부</a></li>
+      <li><a href="#calendar" onclick="closeToc()">일정</a></li>
+      <li><a href="#map"      onclick="closeToc()">오시는 길</a></li>
+      <li><a href="#gallery"  onclick="closeToc()">갤러리</a></li>
+      <li><a href="#account"  onclick="closeToc()">마음 전하기</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ████ CONTACT MODAL ████ -->
+<div id="contact-modal" onclick="closeContact()">
+  <div id="contact-panel" onclick="event.stopPropagation()">
+    <div class="contact-heading">연락하기</div>
+
+    <div class="contact-sep">신랑측</div>
+    <div class="contact-row">
+      <div><div class="contact-who">주예찬</div><div class="contact-role">신랑</div></div>
+      <a href="tel:010-0000-0000" class="call-link">전화하기</a>
+    </div>
+    <div class="contact-row">
+      <div><div class="contact-who">주기곤</div><div class="contact-role">신랑 아버지</div></div>
+      <a href="tel:010-0000-0000" class="call-link">전화하기</a>
+    </div>
+    <div class="contact-row">
+      <div><div class="contact-who">김미옥</div><div class="contact-role">신랑 어머니</div></div>
+      <a href="tel:010-0000-0000" class="call-link">전화하기</a>
+    </div>
+
+    <div class="contact-sep">신부측</div>
+    <div class="contact-row">
+      <div><div class="contact-who">권지혜</div><div class="contact-role">신부</div></div>
+      <a href="tel:010-0000-0000" class="call-link">전화하기</a>
+    </div>
+    <div class="contact-row">
+      <div><div class="contact-who">권영만</div><div class="contact-role">신부 아버지</div></div>
+      <a href="tel:010-0000-0000" class="call-link">전화하기</a>
+    </div>
+    <div class="contact-row">
+      <div><div class="contact-who">김정희</div><div class="contact-role">신부 어머니</div></div>
+      <a href="tel:010-0000-0000" class="call-link">전화하기</a>
+    </div>
+
+    <button class="modal-close-btn" onclick="closeContact()">닫기</button>
+  </div>
+</div>
+
+<script>
+// ===== PHOTO SLOTS (IndexedDB 저장/복원) =====
+const PHOTO_KEYS = [
+  ['hero-file',  'hero-img',  'hero-ph'],
+  ['poem-file',  'poem-img',  'poem-ph'],
+  ['groom-file', 'groom-img', 'groom-ph'],
+  ['bride-file', 'bride-img', 'bride-ph'],
+  ['g1-file', 'g1-img', 'g1-ph'],
+  ['g2-file', 'g2-img', 'g2-ph'],
+  ['g3-file', 'g3-img', 'g3-ph'],
+  ['g4-file', 'g4-img', 'g4-ph'],
+];
+
+function applyPhoto(imgEl, phEl, src) {
+  imgEl.src = src;
+  imgEl.classList.add('loaded');
+  if (phEl) phEl.style.display = 'none';
+}
+
+// IndexedDB — localStorage(~5MB)보다 훨씬 큰 용량 지원
+const DB_READY = new Promise((resolve, reject) => {
+  const req = indexedDB.open('wedding_card_v1', 1);
+  req.onupgradeneeded = e => e.target.result.createObjectStore('photos');
+  req.onsuccess    = e => resolve(e.target.result);
+  req.onerror      = ()  => reject(req.error);
+});
+
+function dbSave(key, dataUrl) {
+  DB_READY.then(db => {
+    db.transaction('photos', 'readwrite').objectStore('photos').put(dataUrl, key);
+  }).catch(() => {});
+}
+
+function dbLoad(key, cb) {
+  DB_READY.then(db => {
+    const req = db.transaction('photos', 'readonly').objectStore('photos').get(key);
+    req.onsuccess = () => { if (req.result) cb(req.result); };
+  }).catch(() => {});
+}
+
+PHOTO_KEYS.forEach(([fileId, imgId, phId]) => {
+  const fileEl = document.getElementById(fileId);
+  const imgEl  = document.getElementById(imgId);
+  const phEl   = document.getElementById(phId);
+
+  // 페이지 로드 시 저장된 사진 복원
+  dbLoad(fileId, src => applyPhoto(imgEl, phEl, src));
+
+  // 새 사진 선택 시 IndexedDB에 저장
+  fileEl.addEventListener('change', function () {
+    if (!this.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      dbSave(fileId, e.target.result);
+      applyPhoto(imgEl, phEl, e.target.result);
+    };
+    reader.readAsDataURL(this.files[0]);
+  });
+});
+
+// ===== PARTICLES =====
+(function spawnParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 24; i++) {
+    const p = document.createElement('div');
+    const flower = Math.random() > 0.42;
+    p.classList.add('particle', flower ? 'particle-flower' : 'particle-leaf');
+    p.style.left = (Math.random() * 110 - 5) + 'vw';
+    const dur = 4.5 + Math.random() * 5.5;
+    p.style.animationDuration = dur + 's';
+    p.style.animationDelay   = (-Math.random() * dur) + 's';
+    const sz = flower ? (4 + Math.random() * 5) : (5 + Math.random() * 7);
+    p.style.width  = sz + 'px';
+    p.style.height = flower ? sz + 'px' : (sz * 1.85) + 'px';
+    if (!flower) p.style.setProperty('transform', 'rotate(' + (Math.random()*360) + 'deg)');
+    container.appendChild(p);
+  }
+})();
+
+// ===== MINI CALENDAR — Mar 2027 (starts Monday=1, wedding=6 sat) =====
+(function buildCal() {
+  const grid = document.getElementById('cal-grid');
+  ['일','월','화','수','목','금','토'].forEach((d, i) => {
+    const el = document.createElement('div');
+    el.className = 'cal-head' + (i===0?' sun':i===6?' sat':'');
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+  for (let i = 0; i < 1; i++) {          // Mar 1 = Monday, 1 empty leading cell
+    const el = document.createElement('div');
+    el.className = 'cal-day empty';
+    el.textContent = '0';
+    grid.appendChild(el);
+  }
+  for (let d = 1; d <= 31; d++) {
+    const el = document.createElement('div');
+    const dow = (1 + d - 1) % 7;         // 0=Sun,1=Mon…6=Sat
+    let cls = 'cal-day';
+    if (dow === 0) cls += ' sun';
+    if (dow === 6) cls += ' sat';
+    if (d === 6)   cls += ' today';      // 결혼일 3월 6일 하이라이트
+    el.className = cls;
+    el.textContent = d;
+    grid.appendChild(el);
+  }
+})();
+
+// ===== BGM =====
+const bgm         = document.getElementById('bgm');
+const bgmFileEl   = document.getElementById('bgm-file');
+const soundIcon   = document.getElementById('sound-icon');
+const musicBanner = document.getElementById('music-banner');
+const musicTitle  = document.getElementById('music-title');
+let bgmLoaded = false;
+
+soundIcon.textContent = '🔊';
+
+// 배너: play/pause 이벤트에 연동
+bgm.addEventListener('play',  () => musicBanner.classList.add('visible'));
+bgm.addEventListener('pause', () => musicBanner.classList.remove('visible'));
+bgm.addEventListener('ended', () => musicBanner.classList.remove('visible'));
+
+// IndexedDB에서 BGM 복원 (새로고침 후에도 유지)
+dbLoad('bgm_title', t => { if (t) musicTitle.textContent = t; });
+dbLoad('bgm_src', src => {
+  if (!src) return;
+  bgm.src = src;
+  bgmLoaded = true;
+  // 복원 후 첫 클릭에 자동 재생
+  document.addEventListener('click', function resume(e) {
+    if (e.target.closest('#sound-btn')) return;
+    bgm.play().then(() => { soundIcon.textContent = '🔊'; }).catch(() => {});
+    document.removeEventListener('click', resume);
+  });
+});
+
+// MP3 파일 선택 처리
+bgmFileEl.addEventListener('change', function () {
+  const file = this.files[0];
+  if (!file) return;
+  // 파일명으로 곡 제목 생성
+  const title = file.name.replace(/\.[^.]+$/, '').replace(/[_\-]/g, ' ').trim();
+  musicTitle.textContent = title;
+  dbSave('bgm_title', title);
+  // 파일을 base64로 변환해 IndexedDB에 저장
+  const reader = new FileReader();
+  reader.onload = e => {
+    dbSave('bgm_src', e.target.result);
+    bgm.src = e.target.result;
+    bgmLoaded = true;
+    bgm.play().then(() => { soundIcon.textContent = '🔊'; }).catch(() => {});
+  };
+  reader.readAsDataURL(file);
+});
+
+// 🔊/🔇 버튼
+// · BGM 미등록 → MP3 파일 선택창 열기
+// · BGM 등록됨 → 재생/일시정지 토글
+function toggleSound() {
+  if (!bgmLoaded) {
+    bgmFileEl.click();
+    return;
+  }
+  if (bgm.paused) {
+    bgm.play().then(() => { soundIcon.textContent = '🔊'; }).catch(() => {});
+  } else {
+    bgm.pause();
+    soundIcon.textContent = '🔇';
+  }
+}
+
+// ===== TOC =====
+function openToc()  { document.getElementById('toc-overlay').classList.add('open'); }
+function closeToc() { document.getElementById('toc-overlay').classList.remove('open'); }
+
+// ===== CONTACT =====
+function openContact()  { document.getElementById('contact-modal').classList.add('open'); }
+function closeContact() { document.getElementById('contact-modal').classList.remove('open'); }
+
+// ===== SHARE =====
+function shareCard() {
+  if (navigator.share) {
+    navigator.share({ title: '청첩장', url: location.href });
+  } else {
+    navigator.clipboard.writeText(location.href)
+      .then(() => alert('링크가 복사되었습니다.'))
+      .catch(() => alert('공유를 지원하지 않는 환경입니다.'));
+  }
+}
+
+// ===== ACCOUNT COPY =====
+function copyAcct(btn, num) {
+  navigator.clipboard.writeText(num).then(() => {
+    btn.textContent = '완료!';
+    btn.classList.add('done');
+    setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('done'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
