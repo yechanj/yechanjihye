@@ -49,6 +49,51 @@
     .photo-placeholder p { font-size: 12px; color: #888; }
     .photo-placeholder small { font-size: 10px; color: #aaa; }
 
+    /* 사진 변경 버튼 */
+    .photo-edit-btn {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 34px;
+      height: 34px;
+      background: rgba(255,255,255,0.92);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      line-height: 1;
+      border: none;
+    }
+    .photo-edit-btn input[type="file"] { display: none; }
+
+    /* 업로드 중 오버레이 */
+    .photo-uploading {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.52);
+      color: #fff;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 0.82rem;
+      z-index: 20;
+    }
+    .photo-uploading.active { display: flex; }
+    .upload-spinner {
+      width: 28px; height: 28px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     /* ========== SECTION BASE ========== */
     .section {
       padding: 52px 28px;
@@ -637,13 +682,13 @@
 <!-- ████ 1. HERO ████ -->
 <section id="hero">
   <div id="hero-cover" class="photo-slot">
-    <img id="hero-img" src="photos/cover.jpg" alt="커버 사진"
-         onload="this.classList.add('loaded'); document.getElementById('hero-ph').style.display='none'"
-         onerror="this.style.display='none'">
+    <img id="hero-img" alt="커버 사진">
     <div class="photo-placeholder" id="hero-ph">
       <span class="ph-icon">📷</span>
-      <p>photos/cover.jpg</p>
+      <p>커버 사진</p>
     </div>
+    <div class="photo-uploading" id="hero-uploading"><div class="upload-spinner"></div><span>업로드 중...</span></div>
+    <label class="photo-edit-btn" title="사진 변경">📷<input type="file" accept="image/*" onchange="uploadPhoto(this.files[0],'cover','hero-img','hero-ph','hero-uploading')"></label>
   </div>
   <div class="overlay"></div>
   <div id="particles"></div>
@@ -676,13 +721,13 @@
   <div class="polaroid-wrap">
     <div class="polaroid">
       <div class="photo-slot" id="poem-slot">
-        <img id="poem-img" src="photos/poem.jpg" alt="웨딩 사진"
-             onload="this.classList.add('loaded'); document.getElementById('poem-ph').style.display='none'"
-             onerror="this.style.display='none'">
+        <img id="poem-img" alt="웨딩 사진">
         <div class="photo-placeholder" id="poem-ph">
           <span class="ph-icon">📷</span>
-          <p>photos/poem.jpg</p>
+          <p>웨딩 사진</p>
         </div>
+        <div class="photo-uploading" id="poem-uploading"><div class="upload-spinner"></div><span>업로드 중...</span></div>
+        <label class="photo-edit-btn" title="사진 변경">📷<input type="file" accept="image/*" onchange="uploadPhoto(this.files[0],'poem','poem-img','poem-ph','poem-uploading')"></label>
       </div>
     </div>
   </div>
@@ -728,23 +773,17 @@
 <section id="couple" class="section section-alt">
   <div class="couple-grid">
     <div class="couple-photo photo-slot" id="groom-slot">
-      <img id="groom-img" src="photos/groom.jpg" alt="신랑"
-           onload="this.classList.add('loaded'); document.getElementById('groom-ph').style.display='none'"
-           onerror="this.style.display='none'">
-      <div class="photo-placeholder" id="groom-ph">
-        <span class="ph-icon">📷</span>
-        <p>photos/groom.jpg</p>
-      </div>
+      <img id="groom-img" alt="신랑">
+      <div class="photo-placeholder" id="groom-ph"><span class="ph-icon">📷</span><p>신랑 사진</p></div>
+      <div class="photo-uploading" id="groom-uploading"><div class="upload-spinner"></div><span>업로드 중...</span></div>
+      <label class="photo-edit-btn" title="사진 변경">📷<input type="file" accept="image/*" onchange="uploadPhoto(this.files[0],'groom','groom-img','groom-ph','groom-uploading')"></label>
     </div>
     <div class="couple-heart">♥</div>
     <div class="couple-photo photo-slot" id="bride-slot">
-      <img id="bride-img" src="photos/bride.jpg" alt="신부"
-           onload="this.classList.add('loaded'); document.getElementById('bride-ph').style.display='none'"
-           onerror="this.style.display='none'">
-      <div class="photo-placeholder" id="bride-ph">
-        <span class="ph-icon">📷</span>
-        <p>photos/bride.jpg</p>
-      </div>
+      <img id="bride-img" alt="신부">
+      <div class="photo-placeholder" id="bride-ph"><span class="ph-icon">📷</span><p>신부 사진</p></div>
+      <div class="photo-uploading" id="bride-uploading"><div class="upload-spinner"></div><span>업로드 중...</span></div>
+      <label class="photo-edit-btn" title="사진 변경">📷<input type="file" accept="image/*" onchange="uploadPhoto(this.files[0],'bride','bride-img','bride-ph','bride-uploading')"></label>
     </div>
   </div>
   <div class="couple-names-row">
@@ -803,28 +842,28 @@
   <span class="section-label-en">Gallery</span>
   <div class="gallery-grid">
     <div class="gallery-item photo-slot" id="g1-slot">
-      <img src="photos/gallery1.jpg" alt="갤러리1"
-           onload="this.classList.add('loaded'); document.getElementById('g1-ph').style.display='none'"
-           onerror="this.style.display='none'">
-      <div class="photo-placeholder" id="g1-ph"><span class="ph-icon">📷</span><p>photos/gallery1.jpg</p></div>
+      <img id="g1-img" alt="갤러리1">
+      <div class="photo-placeholder" id="g1-ph"><span class="ph-icon">📷</span><p>갤러리 1</p></div>
+      <div class="photo-uploading" id="g1-uploading"><div class="upload-spinner"></div><span>업로드 중...</span></div>
+      <label class="photo-edit-btn" title="사진 변경">📷<input type="file" accept="image/*" onchange="uploadPhoto(this.files[0],'gallery1','g1-img','g1-ph','g1-uploading')"></label>
     </div>
     <div class="gallery-item photo-slot" id="g2-slot">
-      <img src="photos/gallery2.jpg" alt="갤러리2"
-           onload="this.classList.add('loaded'); document.getElementById('g2-ph').style.display='none'"
-           onerror="this.style.display='none'">
-      <div class="photo-placeholder" id="g2-ph"><span class="ph-icon">📷</span><p>photos/gallery2.jpg</p></div>
+      <img id="g2-img" alt="갤러리2">
+      <div class="photo-placeholder" id="g2-ph"><span class="ph-icon">📷</span><p>갤러리 2</p></div>
+      <div class="photo-uploading" id="g2-uploading"><div class="upload-spinner"></div><span>업로드 중...</span></div>
+      <label class="photo-edit-btn" title="사진 변경">📷<input type="file" accept="image/*" onchange="uploadPhoto(this.files[0],'gallery2','g2-img','g2-ph','g2-uploading')"></label>
     </div>
     <div class="gallery-item photo-slot" id="g3-slot">
-      <img src="photos/gallery3.jpg" alt="갤러리3"
-           onload="this.classList.add('loaded'); document.getElementById('g3-ph').style.display='none'"
-           onerror="this.style.display='none'">
-      <div class="photo-placeholder" id="g3-ph"><span class="ph-icon">📷</span><p>photos/gallery3.jpg</p></div>
+      <img id="g3-img" alt="갤러리3">
+      <div class="photo-placeholder" id="g3-ph"><span class="ph-icon">📷</span><p>갤러리 3</p></div>
+      <div class="photo-uploading" id="g3-uploading"><div class="upload-spinner"></div><span>업로드 중...</span></div>
+      <label class="photo-edit-btn" title="사진 변경">📷<input type="file" accept="image/*" onchange="uploadPhoto(this.files[0],'gallery3','g3-img','g3-ph','g3-uploading')"></label>
     </div>
     <div class="gallery-item photo-slot" id="g4-slot">
-      <img src="photos/gallery4.jpg" alt="갤러리4"
-           onload="this.classList.add('loaded'); document.getElementById('g4-ph').style.display='none'"
-           onerror="this.style.display='none'">
-      <div class="photo-placeholder" id="g4-ph"><span class="ph-icon">📷</span><p>photos/gallery4.jpg</p></div>
+      <img id="g4-img" alt="갤러리4">
+      <div class="photo-placeholder" id="g4-ph"><span class="ph-icon">📷</span><p>갤러리 4</p></div>
+      <div class="photo-uploading" id="g4-uploading"><div class="upload-spinner"></div><span>업로드 중...</span></div>
+      <label class="photo-edit-btn" title="사진 변경">📷<input type="file" accept="image/*" onchange="uploadPhoto(this.files[0],'gallery4','g4-img','g4-ph','g4-uploading')"></label>
     </div>
   </div>
 </section>
@@ -869,6 +908,7 @@
     </div>
   </div>
 </section>
+
 
 <!-- ████ FLOATING RSVP ████ -->
 <div id="rsvp-float">
@@ -950,6 +990,67 @@
 </div>
 
 <script>
+// ===== CLOUDINARY =====
+const CLOUD_NAME    = 'rpifgmju';
+const UPLOAD_PRESET = 'yechanjihye';
+
+const PHOTO_SLOTS = [
+  { key:'cover',    imgId:'hero-img',  phId:'hero-ph'  },
+  { key:'poem',     imgId:'poem-img',  phId:'poem-ph'  },
+  { key:'groom',    imgId:'groom-img', phId:'groom-ph' },
+  { key:'bride',    imgId:'bride-img', phId:'bride-ph' },
+  { key:'gallery1', imgId:'g1-img',    phId:'g1-ph'    },
+  { key:'gallery2', imgId:'g2-img',    phId:'g2-ph'    },
+  { key:'gallery3', imgId:'g3-img',    phId:'g3-ph'    },
+  { key:'gallery4', imgId:'g4-img',    phId:'g4-ph'    },
+];
+
+function applyPhoto(imgId, phId, url) {
+  const img = document.getElementById(imgId);
+  const ph  = document.getElementById(phId);
+  if (!img) return;
+  img.onload  = () => { img.classList.add('loaded'); if (ph) ph.style.display = 'none'; };
+  img.onerror = () => { img.classList.remove('loaded'); if (ph) ph.style.display = ''; };
+  img.src = url;
+}
+
+function loadAllPhotos() {
+  PHOTO_SLOTS.forEach(({ key, imgId, phId }) => {
+    const url = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/f_auto,q_auto/wedding/${key}`;
+    applyPhoto(imgId, phId, url);
+  });
+}
+loadAllPhotos();
+
+async function uploadPhoto(file, key, imgId, phId, upId) {
+  if (!file) return;
+  const upEl = document.getElementById(upId);
+  if (upEl) upEl.classList.add('active');
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', UPLOAD_PRESET);
+  formData.append('public_id', `wedding/${key}`);
+  formData.append('overwrite', 'true');
+
+  try {
+    const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (data.secure_url) {
+      applyPhoto(imgId, phId, data.secure_url);
+    } else {
+      throw new Error(data.error?.message || '알 수 없는 오류');
+    }
+  } catch(err) {
+    alert('업로드 실패: ' + err.message);
+  } finally {
+    if (upEl) upEl.classList.remove('active');
+  }
+}
+
 // ===== IndexedDB (BGM 저장용) =====
 const DB_READY = new Promise((resolve, reject) => {
   const req = indexedDB.open('wedding_card_v1', 1);
