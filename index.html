@@ -1254,12 +1254,16 @@ document.addEventListener('keydown', e => {
 
 async function getSignature(public_id) {
   const timestamp = Math.round(Date.now() / 1000);
-  const res  = await fetch('/api/sign', {
+  const res = await fetch('/api/sign', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ public_id, timestamp })
   });
-  const data = await res.json();
+  if (!res.ok) throw new Error(`서명 서버 오류 (${res.status}) — Vercel 함수를 확인하세요`);
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); }
+  catch { throw new Error(`서명 서버가 잘못된 응답을 반환했습니다: ${text.slice(0, 80)}`); }
   return { ...data, timestamp };
 }
 
@@ -1284,7 +1288,10 @@ async function uploadPhoto(file, key, imgId, phId, upId) {
     const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
       method: 'POST', body: formData
     });
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); }
+    catch { throw new Error(`Cloudinary 응답 오류 (${res.status}): ${text.slice(0, 80)}`); }
     if (data.secure_url) {
       applyPhoto(imgId, phId, data.secure_url);
     } else {
