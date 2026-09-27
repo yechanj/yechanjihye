@@ -1133,23 +1133,25 @@ bgm.addEventListener('ended', () => musicBanner.classList.remove('visible'));
 function setupBgmAutoplay() {
   document.addEventListener('click', function resume(e) {
     if (e.target.closest('#sound-btn')) return;
-    bgm.play().then(() => { soundIcon.textContent = '🔊'; }).catch(() => {});
+    bgm.play()
+      .then(() => { soundIcon.textContent = '🔊'; })
+      .catch(() => { bgmLoaded = false; });
     document.removeEventListener('click', resume);
   });
 }
 
-// Cloudinary에서 BGM 로드 → 없으면 IndexedDB 폴백
 dbLoad('bgm_title', t => { if (t) musicTitle.textContent = t; });
 
+// 모바일은 canplaythrough가 안 터지므로 URL만 세팅하고 바로 bgmLoaded = true
 const CLOUDINARY_BGM = `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/wedding/bgm.mp3`;
 bgm.src = CLOUDINARY_BGM;
-bgm.addEventListener('canplaythrough', function onReady() {
-  bgmLoaded = true;
-  bgm.removeEventListener('canplaythrough', onReady);
-  setupBgmAutoplay();
-}, { once: true });
+bgmLoaded = true;
+setupBgmAutoplay();
+
+// 실제로 파일이 없으면(404) error 이벤트 → IndexedDB 폴백
 bgm.addEventListener('error', function onErr() {
   bgm.removeEventListener('error', onErr);
+  bgmLoaded = false;
   dbLoad('bgm_src', src => {
     if (!src) return;
     bgm.src = src;
