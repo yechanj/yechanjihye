@@ -19,6 +19,8 @@
       margin: 0 auto;
       overflow-x: hidden;
       padding-bottom: 72px;
+      opacity: 0;
+      transition: opacity 0.35s ease;
     }
 
     /* ========== PHOTO SLOT ========== */
@@ -1144,6 +1146,13 @@
 </div>
 
 <script>
+// 폰트 로드 후 body 표시 (FOUC 방지), 최대 600ms 대기
+(function() {
+  const show = () => { document.body.style.opacity = '1'; };
+  const t = setTimeout(show, 600);
+  document.fonts.ready.then(() => { clearTimeout(t); show(); });
+})();
+
 // ===== CLOUDINARY =====
 const CLOUD_NAME = 'rpifgmju';
 
