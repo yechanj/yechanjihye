@@ -237,6 +237,41 @@
       margin: 0 auto;
     }
 
+    /* ========== HERO 등장 연출 ==========
+       인트로가 떠 있는 동안(html.intro-lock)은 '등장 전' 상태로 두고,
+       인트로가 열리면 --hero-delay 뒤에 차례로 자리를 잡음 */
+    #hero-img {
+      transform-origin: 50% 45%;
+      transition:
+        transform 2.8s cubic-bezier(.16,.8,.24,1) var(--hero-delay, 0s),
+        filter 1.8s ease var(--hero-delay, 0s);
+    }
+    html.intro-lock #hero-img          { transform: scale(1.14); filter: blur(10px) brightness(0.8); }
+    html.intro-lock.fx1 #hero-img      { transform: scale(1.08); filter: blur(6px) brightness(0.9); }
+    html.intro-lock.fx2 #hero-img      { transform: scale(1.1);  filter: blur(8px) brightness(1.7) saturate(0.7); }
+
+    .hero-title-top, .hero-names, .hero-date, .hero-subtitle {
+      transition:
+        opacity 1.4s ease, transform 1.6s cubic-bezier(.2,.7,.2,1),
+        filter 1.4s ease, letter-spacing 2.2s cubic-bezier(.2,.7,.2,1);
+    }
+    .hero-title-top { transition-delay: calc(var(--hero-delay, 0s) + 0.6s); }
+    .hero-names     { transition-delay: calc(var(--hero-delay, 0s) + 0.95s); }
+    .hero-date      { transition-delay: calc(var(--hero-delay, 0s) + 1.15s); }
+    .hero-subtitle  { transition-delay: calc(var(--hero-delay, 0s) + 1.45s); }
+    html.intro-lock .hero-title-top { opacity: 0; transform: translateY(-10px); filter: blur(6px); }
+    html.intro-lock .hero-names     { opacity: 0; transform: translateY(12px); letter-spacing: 12px; }
+    html.intro-lock .hero-date      { opacity: 0; transform: translateY(12px); filter: blur(4px); }
+    html.intro-lock .hero-subtitle  { opacity: 0; transform: translateY(10px); }
+
+    #particles { transition: opacity 2.5s ease calc(var(--hero-delay, 0s) + 1.4s); }
+    html.intro-lock #particles { opacity: 0; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html.intro-lock #hero-img { transform: none; filter: none; }
+      #hero-img, .hero-title-top, .hero-names, .hero-date, .hero-subtitle, #particles { transition-duration: 0.01s; transition-delay: 0s; }
+    }
+
     /* ========== POEM ========== */
     #poem { padding: 52px 24px; }
     .poem-body { text-align: center; }
@@ -540,7 +575,6 @@
     @supports (height: 100dvh) {
       #intro { --ptp: calc(100dvh + var(--sink) - var(--sh) - var(--bt)); }
     }
-    #intro.hiding { opacity: 0; transform: scale(1.04); pointer-events: none; }
     /* 인트로가 떠 있는 동안 뒤 페이지가 스크롤되지 않게 */
     html.intro-lock, html.intro-lock body { overflow: hidden; height: 100%; }
     #intro { touch-action: none; overscroll-behavior: none; }
@@ -710,6 +744,59 @@
     @keyframes introRipple {
       0%   { transform: scale(1);   opacity: 0.9; }
       100% { transform: scale(4.4); opacity: 0; }
+    }
+
+    /* ===== 인트로 → 대문 전환 효과 (?fx=1~4) ===== */
+    @keyframes introOut { from { opacity: 1; } to { opacity: 0; } }
+    #intro.fx-leaving .intro-title,
+    #intro.fx-leaving .intro-info,
+    #intro.fx-leaving .intro-touch { animation: introOut 0.35s ease forwards; }
+    #intro.fx-fade { opacity: 0; transition: opacity 0.9s ease; pointer-events: none; }
+
+    /* 1. 화면 속으로 줌인 */
+    #intro.fx-zoom .intro-phone {
+      transition: transform 1.15s cubic-bezier(.7,0,.25,1), border-color 0.8s ease, box-shadow 0.8s ease;
+      border-color: transparent;
+      box-shadow: none;
+    }
+    #intro.fx-zoom .intro-phone::before { opacity: 0; transition: opacity 0.3s; }
+    #intro.fx-zoom .intro-bg { filter: blur(6px) brightness(0.6); transition: filter 1s ease; }
+
+    /* 2. 햇살 번짐 */
+    .intro-flare {
+      position: absolute; z-index: 5;
+      width: 600vmax; height: 600vmax;
+      margin: -300vmax 0 0 -300vmax;
+      border-radius: 50%;
+      background: radial-gradient(circle,
+        rgba(255,253,245,1) 0%, rgba(255,247,230,0.98) 30%,
+        rgba(255,232,195,0.9) 40%, rgba(255,222,175,0) 55%);
+      transform: scale(0.01);
+      opacity: 0;
+      pointer-events: none;
+      animation: introFlare 1.15s cubic-bezier(.55,0,.3,1) forwards;
+    }
+    @keyframes introFlare {
+      0%   { transform: scale(0.01); opacity: 0; }
+      15%  { opacity: 1; }
+      100% { transform: scale(1);    opacity: 1; }
+    }
+    #intro.fx-flare-out { opacity: 0; transition: opacity 1.1s ease; pointer-events: none; }
+
+    /* 3. 원형으로 열림: 퍼지는 원의 가장자리를 따라가는 빛 고리 */
+    .intro-ring {
+      position: fixed; z-index: 501;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.85);
+      box-shadow: 0 0 18px rgba(255,255,255,0.6), inset 0 0 18px rgba(255,255,255,0.35);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    /* 4. 흐림 디졸브 */
+    #intro.fx-dissolve { animation: introDissolve 1.3s ease forwards; pointer-events: none; }
+    @keyframes introDissolve {
+      to { opacity: 0; filter: blur(16px) brightness(1.2); transform: scale(1.08); }
     }
 
     @keyframes introPhoneIn {
@@ -972,7 +1059,7 @@
 <body>
 
 <!-- ████ INTRO ████ -->
-<div id="intro" onclick="enterCard()">
+<div id="intro" onclick="enterCard(event)">
   <img class="intro-bg" src="photos/intro.jpg" alt="">
   <div class="intro-phone">
     <div class="intro-screen">
@@ -1663,15 +1750,94 @@ bgm.addEventListener('ended', () => musicBanner.classList.remove('visible'));
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 document.getElementById('intro').addEventListener('touchmove', e => e.preventDefault(), { passive: false });
 
-function enterCard() {
-  const intro = document.getElementById('intro');
-  intro.classList.add('hiding');
-  document.documentElement.classList.remove('intro-lock');
-  window.scrollTo(0, 0);
-  setTimeout(() => { intro.style.display = 'none'; }, 820);
+// ===== 인트로 → 대문 전환 효과 =====
+// 주소 뒤에 ?fx=1~4 를 붙여 효과를 고를 수 있음 (기본 1)
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const INTRO_FX = REDUCED_MOTION ? '4'
+  : (['1', '2', '3', '4'].includes(new URLSearchParams(location.search).get('fx'))
+      ? new URLSearchParams(location.search).get('fx') : '1');
+document.documentElement.classList.add('fx' + INTRO_FX);   // 효과별 대문 '등장 전' 상태
+
+// 각 효과는 { heroDelay: 대문이 자리 잡기 시작할 시점(초), total: 인트로를 치울 시점(초) } 을 돌려줌
+const INTRO_EFFECTS = {
+  // 1. 휴대폰 화면 속으로 줌인 → 화면이 꽉 찬 뒤 대문으로 녹아듦
+  1(intro) {
+    const phone = intro.querySelector('.intro-phone');
+    const r = intro.querySelector('.intro-screen').getBoundingClientRect();
+    const p = phone.getBoundingClientRect();
+    const scale = Math.max(innerWidth / r.width, innerHeight / r.height) * 1.04;
+    const dx = innerWidth / 2 - (r.left + r.width / 2);
+    const dy = innerHeight / 2 - (r.top + r.height / 2);
+    phone.style.animation = 'none';
+    phone.style.opacity = '1';
+    phone.style.transformOrigin = `${r.left - p.left + r.width / 2}px ${r.top - p.top + r.height / 2}px`;
+    intro.classList.add('fx-leaving', 'fx-zoom');
+    void phone.offsetWidth;
+    phone.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
+    setTimeout(() => intro.classList.add('fx-fade'), 950);
+    return { heroDelay: 0.95, total: 1.9 };
+  },
+
+  // 2. 사진 속 해에서 햇살이 번져 화면을 덮었다가 대문이 드러남
+  2(intro) {
+    const r = intro.querySelector('.intro-screen').getBoundingClientRect();
+    const flare = document.createElement('div');
+    flare.className = 'intro-flare';
+    flare.style.left = (r.left + r.width * 0.2) + 'px';
+    flare.style.top  = (r.top + r.height * 0.2) + 'px';
+    intro.appendChild(flare);
+    intro.classList.add('fx-leaving');
+    setTimeout(() => intro.classList.add('fx-flare-out'), 1000);
+    return { heroDelay: 1.0, total: 2.2 };
+  },
+
+  // 3. 터치한 곳에서 원이 퍼지며 대문이 드러남
+  3(intro, ev) {
+    const x = ev && ev.clientX ? ev.clientX : innerWidth / 2;
+    const y = ev && ev.clientY ? ev.clientY : innerHeight / 2;
+    const maxR = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)) + 80;
+    const ring = document.createElement('div');
+    ring.className = 'intro-ring';
+    ring.style.left = x + 'px';
+    ring.style.top  = y + 'px';
+    document.body.appendChild(ring);
+    intro.classList.add('fx-leaving');
+    const D = 1400, t0 = performance.now();
+    const ease = k => k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+    (function step(t) {
+      const k = Math.min(1, (t - t0) / D);
+      const R = ease(k) * maxR;
+      const m = `radial-gradient(circle at ${x}px ${y}px, transparent ${R}px, #000 ${R + 60}px)`;
+      intro.style.webkitMaskImage = m;
+      intro.style.maskImage = m;
+      ring.style.width = ring.style.height = (2 * (R + 30)) + 'px';
+      ring.style.opacity = String(Math.min(1, k * 6) * (1 - k));
+      if (k < 1) requestAnimationFrame(step); else ring.remove();
+    })(t0);
+    return { heroDelay: 0.05, total: 1.45 };
+  },
+
+  // 4. 첫 화면이 꿈처럼 흐려지며 대문으로 녹아듦
+  4(intro) {
+    intro.classList.add('fx-leaving', 'fx-dissolve');
+    return { heroDelay: 0.15, total: 1.35 };
+  },
+};
+
+let introEntered = false;
+function enterCard(ev) {
+  if (introEntered) return;
+  introEntered = true;
+  // 음악은 터치한 순간에 바로 (브라우저 자동재생 제한)
   if (bgmLoaded) {
     bgm.play().then(() => { soundIcon.textContent = '🔊'; }).catch(() => {});
   }
+  const intro = document.getElementById('intro');
+  const { heroDelay, total } = INTRO_EFFECTS[INTRO_FX](intro, ev);
+  document.documentElement.style.setProperty('--hero-delay', heroDelay + 's');
+  window.scrollTo(0, 0);
+  document.documentElement.classList.remove('intro-lock');   // 대문 등장 연출 시작
+  setTimeout(() => { intro.style.display = 'none'; }, total * 1000);
 }
 
 dbLoad('bgm_title', t => { if (t) musicTitle.textContent = t; });
