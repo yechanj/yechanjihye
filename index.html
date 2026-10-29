@@ -1709,8 +1709,9 @@ const musicTitle  = document.getElementById('music-title');
 let bgmLoaded = false;
 
 // 재생 상태에 맞춰 배너와 소리 버튼(LP판 회전)을 함께 바꿈
-bgm.addEventListener('play',  () => { musicBanner.classList.add('visible');    soundBtn.classList.add('playing'); });
-bgm.addEventListener('pause', () => { musicBanner.classList.remove('visible'); soundBtn.classList.remove('playing'); });
+let bgmWarmingUp = false;   // 터치 직후 재생 허락만 받는 동안은 배너·버튼을 바꾸지 않음
+bgm.addEventListener('play',  () => { if (bgmWarmingUp) return; musicBanner.classList.add('visible');    soundBtn.classList.add('playing'); });
+bgm.addEventListener('pause', () => { if (bgmWarmingUp) return; musicBanner.classList.remove('visible'); soundBtn.classList.remove('playing'); });
 bgm.addEventListener('ended', () => { musicBanner.classList.remove('visible'); soundBtn.classList.remove('playing'); });
 
 // 인트로가 떠 있는 동안 스크롤 막기 (iOS Safari는 overflow만으로 안 막혀서 터치 이동도 차단)
@@ -1752,14 +1753,34 @@ function playIntroFlare(intro) {
   return { heroDelay: 1.0, total: 2.4 };
 }
 
+// 음악은 대문이 자리 잡을 즈음 조용히 시작해 서서히 커지게.
+// 브라우저는 터치한 순간에만 재생을 허락하므로, 터치 때 소리 없이 재생 허락만 받아 두고 나중에 재생.
+const BGM_DELAY = 1800, BGM_FADE = 2500;
+function startBgmSoftly() {
+  bgmWarmingUp = true;
+  const unlock = bgm.play();
+  bgm.pause();
+  if (unlock) unlock.catch(() => {});
+  setTimeout(() => {
+    bgmWarmingUp = false;
+    bgm.volume = 0;   // 아이폰은 음량 조절이 막혀 있어 페이드 없이 바로 시작됨
+    bgm.play().then(() => {
+      const t0 = performance.now();
+      (function fade(t) {
+        const k = Math.min(1, (t - t0) / BGM_FADE);
+        bgm.volume = k * k;          // 귀에 자연스럽게 들리도록 처음엔 천천히
+        if (k < 1 && !bgm.paused) requestAnimationFrame(fade);
+        else bgm.volume = 1;
+      })(t0);
+    }).catch(() => { bgm.volume = 1; });
+  }, BGM_DELAY);
+}
+
 let introEntered = false;
 function enterCard() {
   if (introEntered) return;
   introEntered = true;
-  // 음악은 터치한 순간에 바로 (브라우저 자동재생 제한)
-  if (bgmLoaded) {
-    bgm.play().catch(() => {});
-  }
+  if (bgmLoaded) startBgmSoftly();
   const intro = document.getElementById('intro');
   const { heroDelay, total } = playIntroFlare(intro);
   document.documentElement.style.setProperty('--hero-delay', heroDelay + 's');
