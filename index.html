@@ -29,7 +29,6 @@
       max-width: 480px;
       margin: 0 auto;
       overflow-x: hidden;
-      padding-bottom: 72px;
       opacity: 0;
       transition: opacity 0.35s ease;
     }
@@ -147,6 +146,7 @@
       background: linear-gradient(160deg, #3d5240 0%, #253028 100%);
     }
     #hero-cover .photo-placeholder .ph-icon { font-size: 40px; }
+    #hero-cover .photo-edit-btn { top: 12px; bottom: auto; z-index: 4; }   /* 아래쪽 소리·공유 버튼과 겹치지 않게 */
     #hero-cover .photo-placeholder p { color: #b8ccb8; }
     #hero-cover .photo-placeholder small { color: #8aaa8a; }
     #hero .overlay {
@@ -916,70 +916,41 @@
       text-overflow: ellipsis;
     }
 
-    /* ========== BOTTOM NAV ========== */
-    #bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 480px;
-      height: 56px;
-      background: rgba(255,255,255,0.96);
+    /* ========== 떠 있는 버튼 (소리 · 공유) ========== */
+    #float-btns {
+      position: fixed; z-index: 100;
+      right: max(16px, calc(50vw - 240px + 16px));   /* 480px 본문 오른쪽 안쪽 */
+      bottom: max(20px, calc(env(safe-area-inset-bottom) + 12px));
+      display: flex; flex-direction: column; gap: 10px;
+      transition: opacity 1.2s ease calc(var(--hero-delay, 0s) + 2.2s);
+    }
+    html.intro-lock #float-btns { opacity: 0; pointer-events: none; }
+    .float-btn {
+      width: 44px; height: 44px;
+      display: grid; place-items: center;
+      padding: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.75);
+      background: rgba(255,252,248,0.72);
+      -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
-      border-top: 1px solid #e4ddd6;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      z-index: 100;
-    }
-    .nav-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
+      box-shadow: 0 6px 18px -6px rgba(60,40,30,0.35), inset 0 1px 0 rgba(255,255,255,0.8);
+      color: #8a6f5c;
       cursor: pointer;
-      padding: 6px 22px;
-      background: none;
-      border: none;
-      color: #7a6a5a;
-      font-family: 'Nanum Myeongjo', serif;
-      font-size: 0.62rem;
-      letter-spacing: 0.5px;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.2s ease, background 0.2s ease;
     }
-    .nav-icon { font-size: 17px; line-height: 1; }
-    .nav-div { width: 1px; height: 22px; background: #e0d8d0; }
+    .float-btn:active { transform: scale(0.92); }
+    .float-btn svg { width: 22px; height: 22px; display: block; overflow: visible; }
 
-
-    /* ========== TOC OVERLAY ========== */
-    #toc-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.48);
-      z-index: 200;
-      align-items: flex-end;
-    }
-    #toc-overlay.open { display: flex; }
-    #toc-panel {
-      background: #fff;
-      width: 100%;
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 22px 24px 44px;
-      border-radius: 14px 14px 0 0;
-    }
-    .toc-heading { font-size: 0.72rem; letter-spacing: 2px; color: #aaa; margin-bottom: 14px; }
-    .toc-list { list-style: none; }
-    .toc-list li a {
-      display: block;
-      padding: 13px 0;
-      font-size: 0.93rem;
-      color: #3a3a3a;
-      text-decoration: none;
-      border-bottom: 1px solid #f0ece6;
-    }
-    .toc-list li:last-child a { border-bottom: none; }
+    /* 소리: 음악이 나오면 LP판이 천천히 돌고, 꺼지면 멈춘 채 사선 */
+    .lp { transform-origin: 12px 12px; animation: lpSpin 4s linear infinite; animation-play-state: paused; }
+    #sound-btn.playing .lp { animation-play-state: running; }
+    .lp-mute { opacity: 1; transition: opacity 0.25s ease; }
+    #sound-btn.playing .lp-mute { opacity: 0; }
+    #sound-btn:not(.playing) .lp { opacity: 0.55; }
+    @keyframes lpSpin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .lp { animation: none; } }
 
     /* ========== CONTACT MODAL ========== */
     #contact-modal {
@@ -1329,39 +1300,25 @@
 </section>
 
 
-<!-- ████ BOTTOM NAV ████ -->
-<nav id="bottom-nav">
-  <button class="nav-btn" id="sound-btn" onclick="toggleSound()">
-    <span class="nav-icon" id="sound-icon">🔇</span>
-    <span>소리</span>
+<!-- ████ 떠 있는 버튼 (소리 · 공유) ████ -->
+<div id="float-btns">
+  <button class="float-btn" id="sound-btn" onclick="toggleSound()" aria-label="배경음악 켜기/끄기">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+      <g class="lp">
+        <circle cx="12" cy="12" r="9"/>
+        <circle cx="12" cy="12" r="5.6" stroke-width="0.8" opacity="0.6"/>
+        <circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/>
+        <path d="M12 3.6a8.4 8.4 0 0 1 6.2 2.7" stroke-width="1" opacity="0.7"/>
+      </g>
+      <line class="lp-mute" x1="4" y1="20" x2="20" y2="4" stroke-width="1.6"/>
+    </svg>
   </button>
-  <div class="nav-div"></div>
-  <button class="nav-btn" onclick="openToc()">
-    <span class="nav-icon">☰</span>
-    <span>목차</span>
+  <button class="float-btn" onclick="shareCard()" aria-label="청첩장 공유하기">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 3 10.5 13.5"/>
+      <path d="M21 3 14.5 21l-4-7.5L3 9.5 21 3z"/>
+    </svg>
   </button>
-  <div class="nav-div"></div>
-  <button class="nav-btn" onclick="shareCard()">
-    <span class="nav-icon">⬆</span>
-    <span>공유</span>
-  </button>
-</nav>
-
-<!-- ████ TOC OVERLAY ████ -->
-<div id="toc-overlay" onclick="closeToc()">
-  <div id="toc-panel" onclick="event.stopPropagation()">
-    <div class="toc-heading">목 차</div>
-    <ul class="toc-list">
-      <li><a href="#hero"     onclick="closeToc()">커버</a></li>
-      <li><a href="#poem"     onclick="closeToc()">말씀</a></li>
-      <li><a href="#invite"   onclick="closeToc()">청첩 인사</a></li>
-      <li><a href="#couple"   onclick="closeToc()">신랑 · 신부</a></li>
-      <li><a href="#calendar" onclick="closeToc()">일정</a></li>
-      <li><a href="#map"      onclick="closeToc()">오시는 길</a></li>
-      <li><a href="#gallery"  onclick="closeToc()">갤러리</a></li>
-      <li><a href="#account"  onclick="closeToc()">마음 전하기</a></li>
-    </ul>
-  </div>
 </div>
 
 <!-- ████ CONTACT MODAL ████ -->
@@ -1746,16 +1703,15 @@ function dbLoad(key, cb) {
 // ===== BGM =====
 const bgm         = document.getElementById('bgm');
 const bgmFileEl   = document.getElementById('bgm-file');
-const soundIcon   = document.getElementById('sound-icon');
+const soundBtn    = document.getElementById('sound-btn');
 const musicBanner = document.getElementById('music-banner');
 const musicTitle  = document.getElementById('music-title');
 let bgmLoaded = false;
 
-soundIcon.textContent = '🔇';
-
-bgm.addEventListener('play',  () => musicBanner.classList.add('visible'));
-bgm.addEventListener('pause', () => musicBanner.classList.remove('visible'));
-bgm.addEventListener('ended', () => musicBanner.classList.remove('visible'));
+// 재생 상태에 맞춰 배너와 소리 버튼(LP판 회전)을 함께 바꿈
+bgm.addEventListener('play',  () => { musicBanner.classList.add('visible');    soundBtn.classList.add('playing'); });
+bgm.addEventListener('pause', () => { musicBanner.classList.remove('visible'); soundBtn.classList.remove('playing'); });
+bgm.addEventListener('ended', () => { musicBanner.classList.remove('visible'); soundBtn.classList.remove('playing'); });
 
 // 인트로가 떠 있는 동안 스크롤 막기 (iOS Safari는 overflow만으로 안 막혀서 터치 이동도 차단)
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -1802,7 +1758,7 @@ function enterCard() {
   introEntered = true;
   // 음악은 터치한 순간에 바로 (브라우저 자동재생 제한)
   if (bgmLoaded) {
-    bgm.play().then(() => { soundIcon.textContent = '🔊'; }).catch(() => {});
+    bgm.play().catch(() => {});
   }
   const intro = document.getElementById('intro');
   const { heroDelay, total } = playIntroFlare(intro);
@@ -1857,7 +1813,7 @@ bgmFileEl.addEventListener('change', async function () {
       bgm.load();
       bgmLoaded = true;
       musicBanner.classList.add('visible');
-      bgm.play().then(() => { soundIcon.textContent = '🔊'; }).catch(() => {});
+      bgm.play().catch(() => {});
 
       // 제목 파일 업로드는 오디오와 독립적으로 처리 (실패해도 오디오에 영향 없음)
       getSignature('wedding/bgm_title.txt').then(titleSig => {
@@ -1879,20 +1835,17 @@ bgmFileEl.addEventListener('change', async function () {
   }
 });
 
-// 🔊/🔇 버튼: 재생/정지 토글 전용 (BGM 선택은 배너의 "변경" 버튼)
+// 소리 버튼: 재생/정지 토글 전용 (BGM 선택은 배너의 "변경" 버튼)
 function toggleSound() {
   if (!bgmLoaded) return;
   if (bgm.paused) {
-    bgm.play().then(() => { soundIcon.textContent = '🔊'; }).catch(() => {});
+    bgm.play().catch(() => {});
   } else {
     bgm.pause();
-    soundIcon.textContent = '🔇';
   }
 }
 
-// ===== TOC =====
-function openToc()  { document.getElementById('toc-overlay').classList.add('open'); }
-function closeToc() { document.getElementById('toc-overlay').classList.remove('open'); }
+
 
 // ===== CONTACT =====
 function openContact()  { document.getElementById('contact-modal').classList.add('open'); }
