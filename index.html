@@ -13,6 +13,7 @@
   <meta property="og:image:width" content="800">
   <meta property="og:image:height" content="400">
   <link rel="preconnect" href="https://res.cloudinary.com">
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js" crossorigin="anonymous" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Nanum+Myeongjo:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
@@ -1588,7 +1589,29 @@ function openContact()  { document.getElementById('contact-modal').classList.add
 function closeContact() { document.getElementById('contact-modal').classList.remove('open'); }
 
 // ===== SHARE =====
+// 카카오 개발자 콘솔 > 내 애플리케이션 > 앱 키 > JavaScript 키
+const KAKAO_JS_KEY = '0a8e8484a7f42b91354bda718f423541';
+const SHARE_URL = 'https://yechanjihye.vercel.app';
+
 function shareCard() {
+  if (KAKAO_JS_KEY && window.Kakao) {
+    if (!Kakao.isInitialized()) Kakao.init(KAKAO_JS_KEY);
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: '주예찬 ♡ 권지혜 결혼합니다',
+        description: '2027년 3월 6일 토요일 오후 4시 40분\n부천 MJ 컨벤션 5층 그랜드볼룸',
+        imageUrl: 'https://res.cloudinary.com/rpifgmju/image/upload/c_fill,w_800,h_1200,g_auto,q_auto,f_jpg/v1792987556/wedding/cover.jpg',
+        imageWidth: 800,
+        imageHeight: 1200,
+        link: { mobileWebUrl: SHARE_URL, webUrl: SHARE_URL },
+      },
+      buttons: [
+        { title: '모바일 청첩장 보기', link: { mobileWebUrl: SHARE_URL, webUrl: SHARE_URL } },
+      ],
+    });
+    return;
+  }
   if (navigator.share) {
     navigator.share({ title: '청첩장', url: location.href });
   } else {
