@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="intro-lock">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -541,6 +541,9 @@
       #intro { --ptp: calc(100dvh + var(--sink) - var(--sh) - var(--bt)); }
     }
     #intro.hiding { opacity: 0; transform: scale(1.04); pointer-events: none; }
+    /* 인트로가 떠 있는 동안 뒤 페이지가 스크롤되지 않게 */
+    html.intro-lock, html.intro-lock body { overflow: hidden; height: 100%; }
+    #intro { touch-action: none; overscroll-behavior: none; }
 
     /* 바깥 배경: 크게 확대해 휴대폰 위로는 숲·하늘만 보이게 (사람은 휴대폰 뒤로) */
     .intro-bg {
@@ -1604,9 +1607,15 @@ bgm.addEventListener('play',  () => musicBanner.classList.add('visible'));
 bgm.addEventListener('pause', () => musicBanner.classList.remove('visible'));
 bgm.addEventListener('ended', () => musicBanner.classList.remove('visible'));
 
+// 인트로가 떠 있는 동안 스크롤 막기 (iOS Safari는 overflow만으로 안 막혀서 터치 이동도 차단)
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+document.getElementById('intro').addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+
 function enterCard() {
   const intro = document.getElementById('intro');
   intro.classList.add('hiding');
+  document.documentElement.classList.remove('intro-lock');
+  window.scrollTo(0, 0);
   setTimeout(() => { intro.style.display = 'none'; }, 820);
   if (bgmLoaded) {
     bgm.play().then(() => { soundIcon.textContent = '🔊'; }).catch(() => {});
@@ -1718,7 +1727,7 @@ function shareCard() {
         link: { mobileWebUrl: SHARE_URL, webUrl: SHARE_URL },
       },
       buttons: [
-        { title: '청첩장 보기💌', link: { mobileWebUrl: SHARE_URL, webUrl: SHARE_URL } },
+        { title: '청첩장 보기 💌', link: { mobileWebUrl: SHARE_URL, webUrl: SHARE_URL } },
       ],
     });
     return;
