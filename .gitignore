@@ -1,0 +1,3 @@
+# 원본 사진 (사이트에는 photos/ 안의 줄인 사본만 사용)
+/[0-9]*.jpg
+/img_reference.jpg
