@@ -663,6 +663,55 @@
     }
     .intro-info-date b { display: block; font-weight: 400; }
 
+    /* 터치 안내: 화면 윗부분에서 점이 눌리듯 움직이고 물결이 퍼짐 */
+    .intro-touch {
+      position: absolute; z-index: 2;
+      left: 50%; top: calc(var(--bt) + var(--sh) * 0.15);
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center;
+      gap: calc(var(--pw) * 0.03);
+      pointer-events: none;
+      opacity: 0;
+      animation: introFade 1.2s ease 2s forwards;
+    }
+    .intro-touch-dot {
+      position: relative;
+      width: max(10px, calc(var(--pw) * 0.034));
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 0 12px rgba(255,255,255,0.55), 0 1px 4px rgba(0,0,0,0.25);
+      animation: introTap 2.4s ease-in-out 2s infinite;
+    }
+    .intro-touch-dot::before,
+    .intro-touch-dot::after {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.9);
+      opacity: 0;
+      animation: introRipple 2.4s cubic-bezier(.2,.6,.3,1) 2.15s infinite;
+    }
+    .intro-touch-dot::after { animation-delay: 2.55s; }
+    .intro-touch-label {
+      color: rgba(255,255,255,0.95);
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: max(11px, calc(var(--pw) * 0.036));
+      letter-spacing: 0.32em;
+      text-indent: 0.32em;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.45);
+    }
+    @keyframes introTap {
+      0%, 100% { transform: scale(1); }
+      8%       { transform: scale(0.72); }
+      20%      { transform: scale(1); }
+    }
+    @keyframes introRipple {
+      0%   { transform: scale(1);   opacity: 0.9; }
+      100% { transform: scale(4.4); opacity: 0; }
+    }
+
     @keyframes introPhoneIn {
       from { opacity: 0; transform: translateY(26px); }
       to   { opacity: 1; transform: none; }
@@ -673,6 +722,8 @@
     @media (prefers-reduced-motion: reduce) {
       .intro-bg { animation: none; }
       .intro-phone, .intro-title, .intro-info { animation: none; opacity: 1; }
+      .intro-touch { animation: none; opacity: 1; }
+      .intro-touch-dot, .intro-touch-dot::before, .intro-touch-dot::after { animation: none; }
     }
 
     /* ========== ACCOUNT ========== */
@@ -928,6 +979,7 @@
       <img class="intro-photo" src="photos/intro.jpg" alt="">
     </div>
     <h1 class="intro-title"><span>With you,</span><span>always</span></h1>
+    <div class="intro-touch"><span class="intro-touch-dot"></span><span class="intro-touch-label">touch</span></div>
     <div class="intro-info">
       <span class="intro-info-name">Yechan</span>
       <span class="intro-info-date">2027<b>March</b>06</span>
