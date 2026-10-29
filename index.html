@@ -289,10 +289,6 @@
       color: #4a3c30;
       letter-spacing: 0.6px;
     }
-    .verse-text .hl {                  /* '지혜'에 은은한 형광펜 */
-      background: linear-gradient(transparent 60%, rgba(222,190,168,0.42) 60%);
-      padding: 0 1px;
-    }
     .verse-ref {
       display: inline-flex; align-items: center; gap: 10px;
       margin-top: 14px;
@@ -325,11 +321,6 @@
       letter-spacing: 0.3px;
     }
     .story p + p { margin-top: 16px; }
-    .story em {
-      font-style: normal;
-      font-weight: 700;
-      color: #9c6b5a;
-    }
     .blessing {
       margin-top: 26px;
       font-size: 0.93rem;
@@ -380,27 +371,6 @@
       letter-spacing: 0.2px;
       margin-bottom: 36px;
     }
-    .parents { margin: 0 auto 32px; }
-    .parent-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: center;
-      gap: 5px;
-      margin-bottom: 6px;
-      font-size: 0.86rem;
-      flex-wrap: wrap;
-    }
-    .parent-sep { color: #c0b0a0; font-size: 0.75rem; }
-    .parent-role { color: #888; font-size: 0.78rem; }
-    .parent-child { font-size: 1rem; font-weight: 700; color: #3a3a3a; margin-left: 2px; }
-    .parent-baptism {
-      font-size: 0.7rem;
-      color: #b0a090;
-      text-align: center;
-      margin-bottom: 18px;
-      letter-spacing: 0.5px;
-    }
-    .deceased { color: #e8a060; margin-right: 2px; }
     .btn {
       display: inline-block;
       padding: 12px 30px;
@@ -1156,15 +1126,15 @@
   <div class="poem-body">
     <div class="verse">
       <span class="verse-mark">&ldquo;</span>
-      <p class="verse-text"><span class="hl">지혜</span>가 제일이니<br><span class="hl">지혜</span>를 얻으라</p>
+      <p class="verse-text">지혜가 제일이니<br>지혜를 얻으라</p>
       <p class="verse-ref">잠언 4:7</p>
     </div>
 
     <div class="poem-ornament"><span></span><i></i><span></span></div>
 
     <div class="story">
-      <p><em>예찬</em>이는 말씀에 순종하여<br><em>지혜</em>를 만났습니다</p>
-      <p><em>지혜</em>는 말씀에 순종하는<br><em>예찬</em>이를 만났습니다.</p>
+      <p>예찬이는 말씀에 순종하여<br>지혜를 만났습니다</p>
+      <p>지혜는 말씀에 순종하는<br>예찬이를 만났습니다.</p>
     </div>
     <p class="blessing">이제 사랑과 믿음으로<br>한 가정을 이루려 합니다.<br>축복으로 함께해 주세요.</p>
 
@@ -1204,23 +1174,6 @@
     자리하시어 축복해 주시면<br>
     대단히 감사하겠습니다.
   </p>
-
-  <div class="parents">
-    <div class="parent-row">
-      <span>주기곤</span>
-      <span class="parent-sep">·</span>
-      <span>김미옥</span>
-      <span class="parent-role">의 차남</span>
-      <span class="parent-child">예찬</span>
-    </div>
-    <div class="parent-row" style="margin-top:14px;">
-      <span>권영만</span>
-      <span class="parent-sep">·</span>
-      <span>김정희</span>
-      <span class="parent-role">의 차녀</span>
-      <span class="parent-child">지혜</span>
-    </div>
-  </div>
 
   <button class="btn" onclick="openContact()">연락하기</button>
 </section>
