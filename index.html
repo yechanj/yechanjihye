@@ -273,24 +273,92 @@
     /* ========== POEM ========== */
     #poem { padding: 52px 24px; }
     .poem-body { text-align: center; }
-    .poem-line {
-      font-size: 0.92rem;
-      line-height: 1.95;
+
+    /* 말씀 */
+    .verse-mark {
+      display: block;
+      height: 26px;
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      line-height: 1;
+      color: #dccbb8;
+    }
+    .verse-text {
+      font-size: 1.12rem;
+      line-height: 1.9;
+      color: #4a3c30;
+      letter-spacing: 0.6px;
+    }
+    .verse-text .hl {                  /* '지혜'에 은은한 형광펜 */
+      background: linear-gradient(transparent 60%, rgba(222,190,168,0.42) 60%);
+      padding: 0 1px;
+    }
+    .verse-ref {
+      display: inline-flex; align-items: center; gap: 10px;
+      margin-top: 14px;
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      text-indent: 0.3em;
+      color: #a8957f;
+    }
+    .verse-ref::before, .verse-ref::after {
+      content: ''; width: 18px; height: 1px; background: #d8cab8;
+    }
+
+    /* 가운데 장식 */
+    .poem-ornament {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin: 36px auto 30px;
+    }
+    .poem-ornament span { width: 46px; height: 1px; background: #e2d6c8; }
+    .poem-ornament i {
+      width: 5px; height: 5px;
+      background: #cdb49c;
+      transform: rotate(45deg);
+    }
+
+    /* 이야기 */
+    .story p {
+      font-size: 0.93rem;
+      line-height: 2.1;
       color: #3a3a3a;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.3px;
     }
-    .poem-divider {
-      border: none;
-      border-top: 1px solid #e4ddd6;
-      margin: 15px auto;
-      width: 68%;
+    .story p + p { margin-top: 16px; }
+    .story em {
+      font-style: normal;
+      font-weight: 700;
+      color: #9c6b5a;
     }
-    .poem-citation {
-      font-size: 0.78rem;
-      color: #9a8a78;
-      margin-top: 22px;
-      letter-spacing: 0.5px;
+    .blessing {
+      margin-top: 26px;
+      font-size: 0.93rem;
+      line-height: 2.1;
+      color: #3a3a3a;
+      letter-spacing: 0.3px;
     }
+
+    /* 부모님 */
+    .poem-parents {
+      margin: 34px auto 0;
+      padding-top: 26px;
+      max-width: 260px;
+      border-top: 1px solid #ede4da;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .poem-parents p {
+      display: flex; align-items: baseline; justify-content: center; gap: 4px;
+      font-size: 0.86rem;
+      color: #4a4a4a;
+    }
+    .poem-parents .pp-names { letter-spacing: 0.5px; }
+    .poem-parents .pp-role  { font-size: 0.76rem; color: #9a8a78; }
+    .poem-parents b {
+      margin-left: 4px;
+      font-size: 1rem;
+      color: #3a3a3a;
+    }
+
     .polaroid-wrap {
       margin: 40px auto 0;
       max-width: 260px;
@@ -1086,15 +1154,24 @@
 <!-- ████ 2. POEM ████ -->
 <section id="poem" class="section">
   <div class="poem-body">
-    <p class="poem-line">별을 보고 있으면</p>
-    <hr class="poem-divider">
-    <p class="poem-line">어둠을 두려워할 필요가 없잖아요</p>
-    <hr class="poem-divider">
-    <p class="poem-line">별이 아름답구나,</p>
-    <p class="poem-line">그 생각부터 하게되니까</p>
-    <hr class="poem-divider">
-    <p class="poem-line">우리, 그렇게 사랑해요</p>
-    <p class="poem-citation">— 정현주 &lt;그래도, 사랑&gt;</p>
+    <div class="verse">
+      <span class="verse-mark">&ldquo;</span>
+      <p class="verse-text"><span class="hl">지혜</span>가 제일이니<br><span class="hl">지혜</span>를 얻으라</p>
+      <p class="verse-ref">잠언 4:7</p>
+    </div>
+
+    <div class="poem-ornament"><span></span><i></i><span></span></div>
+
+    <div class="story">
+      <p><em>예찬</em>이는 말씀에 순종하여<br><em>지혜</em>를 만났습니다</p>
+      <p><em>지혜</em>는 말씀에 순종하는<br><em>예찬</em>이를 만났습니다.</p>
+    </div>
+    <p class="blessing">이제 사랑과 믿음으로<br>한 가정을 이루려 합니다.<br>축복으로 함께해 주세요.</p>
+
+    <div class="poem-parents">
+      <p><span class="pp-names">주기곤 김미옥</span><span class="pp-role">의 사랑둥이</span><b>예찬</b></p>
+      <p><span class="pp-names">권영만 김정희</span><span class="pp-role">의 귀염둥이</span><b>지혜</b></p>
+    </div>
   </div>
 
   <div class="polaroid-wrap">
@@ -1315,7 +1392,7 @@
     <div class="toc-heading">목 차</div>
     <ul class="toc-list">
       <li><a href="#hero"     onclick="closeToc()">커버</a></li>
-      <li><a href="#poem"     onclick="closeToc()">시</a></li>
+      <li><a href="#poem"     onclick="closeToc()">말씀</a></li>
       <li><a href="#invite"   onclick="closeToc()">청첩 인사</a></li>
       <li><a href="#couple"   onclick="closeToc()">신랑 · 신부</a></li>
       <li><a href="#calendar" onclick="closeToc()">일정</a></li>
