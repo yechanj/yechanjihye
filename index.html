@@ -1751,11 +1751,11 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 document.getElementById('intro').addEventListener('touchmove', e => e.preventDefault(), { passive: false });
 
 // ===== 인트로 → 대문 전환 효과 =====
-// 주소 뒤에 ?fx=1~4 를 붙여 효과를 고를 수 있음 (기본 1)
+// 주소 뒤에 ?fx=1~4 를 붙여 효과를 고를 수 있음 (기본 2: 햇살 번짐)
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const INTRO_FX = REDUCED_MOTION ? '4'
   : (['1', '2', '3', '4'].includes(new URLSearchParams(location.search).get('fx'))
-      ? new URLSearchParams(location.search).get('fx') : '1');
+      ? new URLSearchParams(location.search).get('fx') : '2');
 document.documentElement.classList.add('fx' + INTRO_FX);   // 효과별 대문 '등장 전' 상태
 
 // 각 효과는 { heroDelay: 대문이 자리 잡기 시작할 시점(초), total: 인트로를 치울 시점(초) } 을 돌려줌
