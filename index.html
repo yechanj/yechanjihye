@@ -599,11 +599,12 @@
       --sink: calc(var(--pw) * 0.05);                        /* 화면 아래로 넘어가는 길이 */
       --sh: calc((var(--pw) - var(--bs) * 2) * 1.5);         /* 화면 높이 = 사진 비율 2:3 */
       --ptp: calc(100vh + var(--sink) - var(--sh) - var(--bt));   /* 휴대폰 윗변 위치 */
-      /* 바깥 배경 높이: 안쪽의 1.6배 이상, 그리고 사진 속 사람(위에서 20%부터)이 휴대폰 윗변 아래에 오도록 */
-      --bg-h: max(calc(var(--sh) * 1.6), calc(var(--ptp) * 5));
+      /* 바깥 배경 높이: 안쪽 사진의 1.6배 (화면 가로는 항상 덮도록) */
+      --bg-h: max(calc(var(--sh) * 1.6), calc(100vw * 1.5));
       position: fixed; inset: 0; z-index: 500;
       overflow: hidden;
-      background: #3f4a2c;
+      /* 세로로 긴 화면에서 사진 위로 남는 곳은 사진 맨 위 하늘색으로 이어 채움 */
+      background: linear-gradient(180deg, #efeeea 0%, #eae9e5 100%);
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       transition: opacity 0.8s ease, transform 0.8s ease;
@@ -615,11 +616,14 @@
     html.intro-lock, html.intro-lock body { overflow: hidden; height: 100%; }
     #intro { touch-action: none; overscroll-behavior: none; }
 
-    /* 바깥 배경: 크게 확대해 휴대폰 위로는 숲·하늘만 보이게 (사람은 휴대폰 뒤로) */
+    /* 바깥 배경: 바깥 수평선 = 화면 윗변 + 화면 높이의 16% (안쪽 수평선은 37.5%)
+       위가 비면 하늘색 배경으로 부드럽게 이어지도록 사진 윗부분을 흐리게 */
     .intro-bg {
       position: absolute;
       left: 50%;
-      top: min(0px, calc(var(--ptp) - var(--sh) * 0.32));   /* = 휴대폰 윗변 - 배경 높이의 20% */
+      top: calc(var(--ptp) + var(--bt) + var(--sh) * 0.16 - var(--bg-h) * 0.375);
+      -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 9%);
+      mask-image: linear-gradient(180deg, transparent 0%, #000 9%);
       height: var(--bg-h);
       width: max(100vw, calc(var(--bg-h) * 0.6667));
       max-width: none;
