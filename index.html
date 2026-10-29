@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>예찬❤️지혜</title>
+  <meta name="description" content="2027년 3월 6일 토요일 오후 4시 40분 · 부천 MJ 컨벤션 5층 그랜드볼룸">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yechanjihye.vercel.app/">
+  <meta property="og:title" content="주예찬 ❤️ 권지혜 결혼합니다">
+  <meta property="og:description" content="2027년 3월 6일 토요일 오후 4시 40분 · 부천 MJ 컨벤션 5층 그랜드볼룸">
+  <meta property="og:image" content="https://res.cloudinary.com/rpifgmju/image/upload/c_fill,w_800,h_400,g_auto,q_auto,f_jpg/v1792987556/wedding/cover.jpg">
+  <meta property="og:image:width" content="800">
+  <meta property="og:image:height" content="400">
+  <link rel="preconnect" href="https://res.cloudinary.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Nanum+Myeongjo:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
@@ -812,7 +821,7 @@
   <button class="intro-btn" onclick="enterCard()">청첩장 열기</button>
 </div>
 
-<audio id="bgm" loop preload="auto"></audio>
+<audio id="bgm" loop preload="none"></audio>
 <input type="file" id="bgm-file" accept="audio/*" style="display:none">
 
 <!-- 상단 음악 배너 -->
@@ -1169,9 +1178,11 @@ let photoVersions = (() => {
   try { return JSON.parse(localStorage.getItem('photoVersions') || '{}'); } catch { return {}; }
 })();
 
+// 원본(수 MB) 대신 화면 크기에 맞게 줄인 사진을 받음
 function getPhotoUrl(key) {
-  return photoVersions[key] ||
+  const url = photoVersions[key] ||
     `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/f_auto/wedding/${key}`;
+  return url.replace('/upload/f_auto/', '/upload/f_auto,q_auto,w_1080/');
 }
 
 function savePhotoVersions() {
@@ -1243,10 +1254,13 @@ function buildGallery() {
 }
 
 function loadGalleryPhotos() {
+  // 버전 목록을 받았으면 실제로 올라간 사진만 요청 (빈 슬롯 50개 요청 방지)
+  const hasVersions = Object.keys(photoVersions).length > 0;
   for (let i = 1; i <= GALLERY_MAX; i++) {
     const img  = document.getElementById(`g${i}-img`);
     const slot = document.getElementById(`g${i}-slot`);
     if (!img || !slot) continue;
+    if (hasVersions && !photoVersions[`gallery${i}`]) continue;
     img.onload  = () => { img.classList.add('loaded'); slot.style.display = ''; };
     img.onerror = () => { slot.style.display = 'none'; };
     img.src = getPhotoUrl(`gallery${i}`);
