@@ -1594,6 +1594,42 @@ async function getSignature(public_id) {
   return { ...data, timestamp };
 }
 
+// Cloudinary 무료 플랜 제한(10MB)을 넘는 사진만 줄여서 올림
+const UPLOAD_MAX_BYTES = 10 * 1024 * 1024;
+const UPLOAD_MAX_SIDE  = 3000;
+
+async function shrinkIfTooLarge(file) {
+  if (file.size <= UPLOAD_MAX_BYTES) return file;
+
+  const url = URL.createObjectURL(file);
+  try {
+    const img = new Image();
+    img.src = url;
+    await img.decode();
+
+    const longSide = Math.max(img.naturalWidth, img.naturalHeight);
+    let scale = Math.min(1, UPLOAD_MAX_SIDE / longSide);
+    while (true) {
+      const canvas = document.createElement('canvas');
+      canvas.width  = Math.round(img.naturalWidth * scale);
+      canvas.height = Math.round(img.naturalHeight * scale);
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff'; // 투명 PNG가 JPEG에서 검게 나오지 않도록
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+      if (!blob) throw new Error('사진 변환 실패');
+      if (blob.size <= UPLOAD_MAX_BYTES) return blob;
+      scale *= 0.8;
+    }
+  } catch (err) {
+    throw new Error(`사진을 자동으로 줄이지 못했습니다. 10MB 이하로 줄여서 올려주세요. (${err.message})`);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 async function uploadPhoto(file, key, imgId, phId, upId) {
   if (!file) return;
   const upEl = document.getElementById(upId);
@@ -1602,9 +1638,10 @@ async function uploadPhoto(file, key, imgId, phId, upId) {
   try {
     const public_id = `wedding/${key}`;
     const { signature, api_key, timestamp } = await getSignature(public_id);
+    const uploadFile = await shrinkIfTooLarge(file);
 
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', uploadFile);
     formData.append('api_key', api_key);
     formData.append('timestamp', String(timestamp));
     formData.append('signature', signature);
