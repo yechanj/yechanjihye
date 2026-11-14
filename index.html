@@ -361,15 +361,24 @@
     }
     .polaroid .photo-slot { aspect-ratio: 4/3; }
 
-    /* ========== INVITE ========== */
-    #invite { text-align: center; }
-    .invite-text {
-      font-size: 0.92rem;
-      line-height: 2.3;
-      color: #3a3a3a;
-      letter-spacing: 0.2px;
-      margin-bottom: 36px;
+    /* 연락하기: 폴라로이드 사진 아래 */
+    .contact-cta-wrap { margin-top: 44px; text-align: center; }
+    .contact-cta {
+      display: inline-flex; align-items: center; gap: 9px;
+      height: 46px; padding: 0 26px 0 22px;
+      border: 1px solid #d8c9bb; border-radius: 23px;
+      background: #fff;
+      color: #6a5444;
+      font-family: 'Nanum Myeongjo', serif;
+      font-size: 0.86rem; letter-spacing: 0.14em;
+      box-shadow: 0 6px 16px -10px rgba(90,60,40,0.35);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.2s ease, background 0.2s ease;
     }
+    .contact-cta:active { transform: scale(0.96); background: #faf6f2; }
+    .contact-cta svg { width: 16px; height: 16px; display: block; color: #b09580; }
+
     .btn {
       display: inline-block;
       padding: 12px 30px;
@@ -456,12 +465,17 @@
     #map { text-align: center; }
     .map-venue-name { font-size: 1rem; color: #3a3a3a; margin-bottom: 4px; }
     .map-venue-addr { font-size: 0.78rem; color: #999; margin-bottom: 18px; }
+    /* 양옆에 여백을 두어 지도를 피해 스크롤할 수 있게 */
     .kakaomap-wrap {
-      width: 100%;
-      height: 360px;   /* mapHeight와 동일 — 하단 바 잘라냄 */
+      width: calc(100% - 36px);
+      max-width: 340px;
+      height: 230px;   /* mapHeight와 동일 — 하단 바 잘라냄 */
+      margin: 0 auto 20px;
       overflow: hidden;
-      margin-bottom: 20px;
       border: 1px solid #e4ddd6;
+      border-radius: 12px;
+      box-shadow: 0 8px 22px -14px rgba(90,60,40,0.4);
+      isolation: isolate; transform: translateZ(0);   /* iOS에서 둥근 모서리 밖으로 지도가 삐져나오지 않게 */
     }
     .kakaomap-wrap .root_daum_roughmap { width: 100% !important; }
     .kakaomap-wrap img { max-width: 100%; }
@@ -825,23 +839,40 @@
       padding-bottom: 10px;
       margin-bottom: 14px;
     }
+    /* 이름 / 은행 + 계좌번호(한 줄) / 복사 버튼 */
     .account-row {
-      display: flex;
+      display: grid;
+      grid-template-columns: auto 1fr auto auto;
+      grid-template-areas:
+        "name name copy edit"
+        "bank num  copy edit";
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
+      row-gap: 3px;
+      padding: 12px 0;
+      border-top: 1px solid #f5f1ec;
     }
-    .account-row:last-child { margin-bottom: 0; }
-    .account-info { flex: 1; }
-    .account-name { font-size: 0.88rem; color: #3a3a3a; }
-    .account-bank { font-size: 0.72rem; color: #aaa; margin-top: 2px; }
+    .account-card-title + .account-row { padding-top: 0; border-top: none; }
+    .account-row:last-child { padding-bottom: 0; }
+    .account-info { display: contents; }
+    .account-name { grid-area: name; font-size: 0.88rem; color: #3a3a3a; }
+    .account-bank {
+      grid-area: bank;
+      font-size: 0.74rem; color: #a89888;
+      white-space: nowrap;
+      margin-right: 7px;
+    }
     .account-num {
-      flex: 1;
-      text-align: center;
-      font-size: 0.82rem;
+      grid-area: num;
+      min-width: 0;
+      font-size: 0.8rem;
       color: #5a4a3a;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      overflow: hidden;   /* 길면 fitAccountNums()가 글자를 줄임 */
+      font-variant-numeric: tabular-nums;
     }
+    .account-row .copy-btn { grid-area: copy; margin-left: 10px; }
+    .account-row .edit-account-btn { grid-area: edit; margin-left: 4px; }
     .copy-btn {
       font-size: 0.7rem;
       color: #8a7a68;
@@ -854,6 +885,17 @@
       transition: all 0.15s;
     }
     .copy-btn.done { color: #6a9a6a; border-color: #9aba9a; background: #f0f6f0; }
+
+    /* ========== 편집 버튼 ==========
+       평소엔 숨기고, 주소 뒤에 ?edit 를 붙여 들어오면(html.edit-mode) 다시 보임 */
+    html:not(.edit-mode) .photo-edit-btn,
+    html:not(.edit-mode) .gallery-add-btn,
+    html:not(.edit-mode) #lb-edit,
+    html:not(.edit-mode) #lb-delete,
+    html:not(.edit-mode) #lb-before,
+    html:not(.edit-mode) #lb-after,
+    html:not(.edit-mode) .edit-account-btn,
+    html:not(.edit-mode) .edit-icon-btn { display: none !important; }
 
     /* ========== 떠 있는 버튼 (소리 · 공유) ========== */
     #float-btns {
@@ -958,6 +1000,15 @@
       text-align: center;
       padding: 10px 0 4px;
     }
+    .contact-num {
+      font-size: 0.8rem;
+      color: #7a6a5a;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+      text-decoration: none;
+      font-variant-numeric: tabular-nums;
+      margin-right: 4px;
+    }
     .modal-close-btn {
       display: block;
       width: 100%;
@@ -1007,7 +1058,7 @@
 </script>
 
 <!-- 배경음악: 바꿀 때는 music/ 폴더의 파일과 이 경로를 교체 -->
-<audio id="bgm" src="music/sheluvme.mp3" loop preload="none"></audio>
+<audio id="bgm" src="music/whatmakesyoubeautiful.mp3" loop preload="none"></audio>
 
 <!-- ████ 1. HERO ████ -->
 <section id="hero">
@@ -1070,25 +1121,13 @@
       </div>
     </div>
   </div>
-</section>
 
-<!-- ████ 3. INVITE ████ -->
-<section id="invite" class="section">
-  <span class="section-label-en">Invite you</span>
-
-  <p class="invite-text">
-    저희 두 사람이<br>
-    평생을 함께하기 위해<br>
-    서로의 반려자가 되려 합니다.<br>
-    <br>
-    그 진실한 서약을 하는 자리에<br>
-    소중한 분들을 모십니다.<br>
-    <br>
-    자리하시어 축복해 주시면<br>
-    대단히 감사하겠습니다.
-  </p>
-
-  <button class="btn" onclick="openContact()">연락하기</button>
+  <div class="contact-cta-wrap">
+    <button type="button" class="contact-cta" onclick="openContact()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h3.5l1.6 4.2-2.2 1.4a11 11 0 0 0 6.5 6.5l1.4-2.2L20 15.5V19a1.5 1.5 0 0 1-1.6 1.5A16.5 16.5 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4z"/></svg>
+      연락하기
+    </button>
+  </div>
 </section>
 
 <!-- ████ 4. COUPLE PHOTOS ████ -->
@@ -1154,7 +1193,7 @@
       "timestamp" : "1790467234580",
       "key"       : "vetnycrmr6w",
       "mapWidth"  : "640",
-      "mapHeight" : "360"
+      "mapHeight" : "230"
     }).render();
   </script>
 </section>
@@ -1292,6 +1331,7 @@
     <div class="contact-row">
       <div><div class="contact-who">주예찬</div><div class="contact-role">신랑</div></div>
       <div class="contact-actions">
+        <a class="contact-num">—</a>
         <a href="tel:010-0000-0000" class="call-icon" id="call-yechan">📞</a>
         <button class="edit-icon-btn" onclick="editPhone('yechan')">✏️</button>
       </div>
@@ -1299,6 +1339,7 @@
     <div class="contact-row">
       <div><div class="contact-who">주기곤</div><div class="contact-role">신랑 아버지</div></div>
       <div class="contact-actions">
+        <a class="contact-num">—</a>
         <a href="tel:010-0000-0000" class="call-icon" id="call-groom-dad">📞</a>
         <button class="edit-icon-btn" onclick="editPhone('groom-dad')">✏️</button>
       </div>
@@ -1306,6 +1347,7 @@
     <div class="contact-row">
       <div><div class="contact-who">김미옥</div><div class="contact-role">신랑 어머니</div></div>
       <div class="contact-actions">
+        <a class="contact-num">—</a>
         <a href="tel:010-0000-0000" class="call-icon" id="call-groom-mom">📞</a>
         <button class="edit-icon-btn" onclick="editPhone('groom-mom')">✏️</button>
       </div>
@@ -1315,6 +1357,7 @@
     <div class="contact-row">
       <div><div class="contact-who">권지혜</div><div class="contact-role">신부</div></div>
       <div class="contact-actions">
+        <a class="contact-num">—</a>
         <a href="tel:010-0000-0000" class="call-icon" id="call-jihye">📞</a>
         <button class="edit-icon-btn" onclick="editPhone('jihye')">✏️</button>
       </div>
@@ -1322,6 +1365,7 @@
     <div class="contact-row">
       <div><div class="contact-who">권영만</div><div class="contact-role">신부 아버지</div></div>
       <div class="contact-actions">
+        <a class="contact-num">—</a>
         <a href="tel:010-0000-0000" class="call-icon" id="call-bride-dad">📞</a>
         <button class="edit-icon-btn" onclick="editPhone('bride-dad')">✏️</button>
       </div>
@@ -1329,6 +1373,7 @@
     <div class="contact-row">
       <div><div class="contact-who">김정희</div><div class="contact-role">신부 어머니</div></div>
       <div class="contact-actions">
+        <a class="contact-num">—</a>
         <a href="tel:010-0000-0000" class="call-icon" id="call-bride-mom">📞</a>
         <button class="edit-icon-btn" onclick="editPhone('bride-mom')">✏️</button>
       </div>
@@ -1345,6 +1390,9 @@
   const t = setTimeout(show, 600);
   document.fonts.ready.then(() => { clearTimeout(t); show(); });
 })();
+
+// 주소 뒤에 ?edit 를 붙이면 사진·계좌·연락처 편집 버튼이 보임
+if (new URLSearchParams(location.search).has('edit')) document.documentElement.classList.add('edit-mode');
 
 // ===== CLOUDINARY =====
 const CLOUD_NAME = 'rpifgmju';
@@ -1424,6 +1472,26 @@ function loadAllPhotos() {
   loadGalleryPhotos();
 }
 initPhotos();
+
+// ===== 뒤로 가기로 창 닫기 =====
+// 확대 사진·연락하기 창을 열 때 방문 기록을 하나 쌓아 두어,
+// 폰의 뒤로 가기가 청첩장을 나가지 않고 열린 창만 닫게 함
+let backClose = null;   // 지금 열린 창을 닫는 함수
+function openWithBack(hide) {
+  if (backClose) return;
+  backClose = hide;
+  history.pushState({ overlay: true }, '');
+}
+function closeWithBack(hide) {
+  if (backClose) history.back();   // popstate 에서 닫힘
+  else hide();
+}
+window.addEventListener('popstate', () => {
+  if (!backClose) return;
+  const hide = backClose;
+  backClose = null;
+  hide();
+});
 
 // ===== GALLERY =====
 // 표시 순서는 photoVersions.galleryOrder 가 결정 (사진 키 목록)
@@ -1552,12 +1620,14 @@ function openLightbox(key) {
   updateLightbox();
   document.getElementById('lightbox').classList.add('open');
   document.body.style.overflow = 'hidden';
+  openWithBack(hideLightbox);
 }
 
-function closeLightbox() {
+function hideLightbox() {
   document.getElementById('lightbox').classList.remove('open');
   document.body.style.overflow = '';
 }
+function closeLightbox() { closeWithBack(hideLightbox); }
 
 function moveLightbox(dir) {
   if (!lbPhotos.length) return;
@@ -1882,8 +1952,9 @@ function toggleSound() {
 
 
 // ===== CONTACT =====
-function openContact()  { document.getElementById('contact-modal').classList.add('open'); }
-function closeContact() { document.getElementById('contact-modal').classList.remove('open'); }
+function openContact()  { document.getElementById('contact-modal').classList.add('open'); openWithBack(hideContact); }
+function hideContact()  { document.getElementById('contact-modal').classList.remove('open'); }
+function closeContact() { closeWithBack(hideContact); }
 
 // ===== SHARE =====
 // 카카오 개발자 콘솔 > 내 애플리케이션 > 앱 키 > JavaScript 키
@@ -1934,17 +2005,32 @@ const CONTACT_PUBLIC_ID = 'wedding/contact_data.json';
 let contactData = { phones: {}, accounts: {} };
 
 function applyContactData(data) {
-  Object.entries(data.phones  || {}).forEach(([id, num]) => {
-    const el = document.getElementById(`call-${id}`);
-    if (el) el.href = `tel:${num}`;
-  });
+  Object.entries(data.phones  || {}).forEach(([id, num]) => showPhone(id, num));
   Object.entries(data.accounts || {}).forEach(([id, info]) => {
     const b = document.getElementById(`bank-${id}`);
     const n = document.getElementById(`num-${id}`);
     if (b) b.textContent = info.bank || '—';
     if (n) n.textContent = info.num  || '—';
   });
+  fitAccountNums();
 }
+
+// 계좌번호가 칸보다 길면 한 줄에 들어갈 때까지 글자 크기를 줄임
+function fitAccountNums() {
+  document.querySelectorAll('.account-num').forEach(el => {
+    el.style.fontSize = '';
+    el.style.letterSpacing = '';
+    let size = parseFloat(getComputedStyle(el).fontSize);
+    const min = size * 0.65;
+    if (el.scrollWidth > el.clientWidth) el.style.letterSpacing = '0';
+    while (el.scrollWidth > el.clientWidth && size > min) {
+      size -= 0.5;
+      el.style.fontSize = size + 'px';
+    }
+  });
+}
+window.addEventListener('resize', fitAccountNums);
+document.fonts.ready.then(fitAccountNums);
 
 async function loadContactData() {
   // localStorage 캐시 우선 적용 (빠름)
@@ -1994,14 +2080,22 @@ async function saveContactData() {
   } catch {}
 }
 
-function editPhone(id) {
+// 전화 아이콘과 그 옆 번호 글자를 함께 갱신
+function showPhone(id, num) {
   const el = document.getElementById(`call-${id}`);
+  if (!el) return;
+  el.href = `tel:${num}`;
+  const label = el.closest('.contact-row').querySelector('.contact-num');
+  if (label) { label.textContent = num || '—'; label.href = `tel:${num}`; }
+}
+
+function editPhone(id) {
   const current = contactData.phones[id] || '';
   const num = prompt('전화번호 입력 (예: 010-1234-5678)', current);
   if (num === null) return;
   const val = num.trim();
   if (!val) return;
-  if (el) el.href = `tel:${val}`;
+  showPhone(id, val);
   contactData.phones[id] = val;
   saveContactData();
 }
@@ -2016,6 +2110,7 @@ function editAccount(id) {
   if (num === null) return;
   if (bankEl) bankEl.textContent = bank || '—';
   if (numEl)  numEl.textContent  = num  || '—';
+  fitAccountNums();
   contactData.accounts[id] = { bank: bank || '', num: num || '' };
   saveContactData();
 }
